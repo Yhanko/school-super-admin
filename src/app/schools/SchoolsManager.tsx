@@ -3,7 +3,7 @@ import {
   School,
   Plus,
   X,
-} from 'lucide-react';
+} from '../../lib/icons';
 import { SchoolsList } from "./Shools"
 
 // Dados fictícios para simular a resposta do Supabase

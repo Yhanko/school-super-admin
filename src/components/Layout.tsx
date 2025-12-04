@@ -9,9 +9,9 @@ import {
   Menu,
   X,
   Users2,
-  Parentheses,
-  UserCircle2,
-} from "lucide-react";
+  User,
+  SquareUser 
+} from "../lib/icons";
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,9 +21,9 @@ export function Layout() {
   const navigation = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Schools", icon: School, path: "/schools" },
-    { name: "Students", icon: Users2, path: "/students" },
-    { name: "Parents", icon: Parentheses, path: "/parents" },
-    { name: "Teachers", icon: UserCircle2, path: "/teachers" },
+    { name: "Students", icon: User, path: "/students" },
+    { name: "Parents", icon: Users2, path: "/parents" },
+    { name: "Teachers", icon: SquareUser, path: "/teachers" },
     { name: "Payments", icon: DollarSign, path: "/payments" },
     { name: "Platforms", icon: Activity, path: "/platforms" },
   ];

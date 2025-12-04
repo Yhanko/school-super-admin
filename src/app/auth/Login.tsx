@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogIn } from 'lucide-react';
+import { LogIn } from '../../lib/icons';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authSchema, AuthSchema } from "../../services/schema/auth";

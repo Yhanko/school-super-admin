@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from '../../lib/icons';
 
 interface Payment {
   id: string;

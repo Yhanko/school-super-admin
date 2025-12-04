@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X } from "../lib/icons";
 import { Teacher, TeacherAction } from "../types/teacher";
 
 type TeacherModalProps = {

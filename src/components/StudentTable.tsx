@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye } from "../lib/icons";
 import { Student } from "../types/student";
 import { Badge } from "./Badge";
 

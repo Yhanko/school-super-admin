@@ -9,7 +9,7 @@ import {
   DollarSign,
   TrendingUp,
   Activity
-} from 'lucide-react';
+} from '../../lib/icons';
 
 interface DashboardStats {
   totalSchools: number;

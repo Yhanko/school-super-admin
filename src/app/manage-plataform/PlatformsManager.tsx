@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Activity, Users, Clock, Smartphone, Globe, Monitor, Zap } from 'lucide-react';
+import { Activity, Users, Clock, Smartphone, Globe, Monitor, Zap } from '../../lib/icons';
 
 interface Platform {
   id: string;

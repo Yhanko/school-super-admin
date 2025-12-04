@@ -1,7 +1,7 @@
 
 import { 
   Building2
-} from 'lucide-react';
+} from '../../lib/icons';
 const recentSchools = [
     { id: 1, name: "Escola Primária ABC", studentsCount: 350, teachersCount: 25, status: "active" },
     { id: 2, name: "Colégio XYZ", studentsCount: 500, teachersCount: 40, status: "blocked" },
