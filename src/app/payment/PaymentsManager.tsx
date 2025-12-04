@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from '../../lib/icons';
 
 interface Payment {
   id: string;
@@ -22,9 +21,171 @@ interface PaymentWithDetails extends Payment {
   student_name?: string;
 }
 
+const MOCK_PAYMENTS: PaymentWithDetails[] = [
+  {
+    id: '1',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    parent_name: 'John Smith',
+    student_name: 'Emma Smith',
+    amount: 1500,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'credit_card',
+    status: 'completed',
+    description: 'Monthly tuition payment',
+    transaction_id: 'TXN-2024-001',
+    paid_at: '2024-12-01T10:30:00Z',
+    created_at: '2024-12-01T10:30:00Z'
+  },
+  {
+    id: '2',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    parent_name: 'Sarah Johnson',
+    student_name: 'Michael Johnson',
+    amount: 800,
+    currency: 'USD',
+    payment_type: 'activities',
+    payment_method: 'bank_transfer',
+    status: 'completed',
+    description: 'Sports activities fee',
+    transaction_id: 'TXN-2024-002',
+    paid_at: '2024-11-30T14:15:00Z',
+    created_at: '2024-11-30T14:15:00Z'
+  },
+  {
+    id: '3',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    parent_name: 'Robert Davis',
+    student_name: 'Jessica Davis',
+    amount: 1500,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'credit_card',
+    status: 'pending',
+    description: 'Monthly tuition payment',
+    transaction_id: 'TXN-2024-003',
+    paid_at: null,
+    created_at: '2024-12-03T09:00:00Z'
+  },
+  {
+    id: '4',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    parent_name: 'Maria Garcia',
+    student_name: 'Lucas Garcia',
+    amount: 2000,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'paypal',
+    status: 'completed',
+    description: 'Quarterly tuition',
+    transaction_id: 'TXN-2024-004',
+    paid_at: '2024-11-28T11:45:00Z',
+    created_at: '2024-11-28T11:45:00Z'
+  },
+  {
+    id: '5',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    parent_name: 'James Wilson',
+    student_name: 'Sophia Wilson',
+    amount: 500,
+    currency: 'USD',
+    payment_type: 'exam_fees',
+    payment_method: 'credit_card',
+    status: 'failed',
+    description: 'Standardized exam fee',
+    transaction_id: 'TXN-2024-005',
+    paid_at: null,
+    created_at: '2024-12-02T16:20:00Z'
+  },
+  {
+    id: '6',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    parent_name: 'Patricia Anderson',
+    student_name: 'David Anderson',
+    amount: 1200,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'bank_transfer',
+    status: 'completed',
+    description: 'Monthly tuition payment',
+    transaction_id: 'TXN-2024-006',
+    paid_at: '2024-11-25T08:30:00Z',
+    created_at: '2024-11-25T08:30:00Z'
+  },
+  {
+    id: '7',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    parent_name: 'Christopher Martinez',
+    student_name: 'Isabella Martinez',
+    amount: 300,
+    currency: 'USD',
+    payment_type: 'supplies',
+    payment_method: 'credit_card',
+    status: 'pending',
+    description: 'School supplies package',
+    transaction_id: 'TXN-2024-007',
+    paid_at: null,
+    created_at: '2024-12-03T13:50:00Z'
+  },
+  {
+    id: '8',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    parent_name: 'Jennifer Brown',
+    student_name: 'William Brown',
+    amount: 1500,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'paypal',
+    status: 'completed',
+    description: 'Monthly tuition payment',
+    transaction_id: 'TXN-2024-008',
+    paid_at: '2024-11-22T15:10:00Z',
+    created_at: '2024-11-22T15:10:00Z'
+  },
+  {
+    id: '9',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    parent_name: 'Linda Taylor',
+    student_name: 'Olivia Taylor',
+    amount: 650,
+    currency: 'USD',
+    payment_type: 'lab_fees',
+    payment_method: 'credit_card',
+    status: 'completed',
+    description: 'Science lab equipment fee',
+    transaction_id: 'TXN-2024-009',
+    paid_at: '2024-11-20T12:25:00Z',
+    created_at: '2024-11-20T12:25:00Z'
+  },
+  {
+    id: '10',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    parent_name: 'Daniel Thomas',
+    student_name: 'James Thomas',
+    amount: 1800,
+    currency: 'USD',
+    payment_type: 'tuition',
+    payment_method: 'bank_transfer',
+    status: 'completed',
+    description: 'Semester tuition',
+    transaction_id: 'TXN-2024-010',
+    paid_at: '2024-11-18T09:45:00Z',
+    created_at: '2024-11-18T09:45:00Z'
+  }
+];
+
 export function PaymentsManager() {
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [stats, setStats] = useState({
@@ -37,65 +198,9 @@ export function PaymentsManager() {
   });
 
   useEffect(() => {
-    loadPayments();
+    setPayments(MOCK_PAYMENTS);
+    calculateStats(MOCK_PAYMENTS);
   }, []);
-
-  const loadPayments = async () => {
-    try {
-      const { data: paymentsData, error } = await supabase
-        .from('payments')
-        .select(`
-          *,
-          schools (name),
-          parents (user_id),
-          students (user_id)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (paymentsData) {
-        const enrichedPayments = await Promise.all(
-          paymentsData.map(async (payment: any) => {
-            let parentName = '';
-            let studentName = '';
-
-            if (payment.parents?.user_id) {
-              const { data: parentUser } = await supabase
-                .from('school_users')
-                .select('full_name')
-                .eq('id', payment.parents.user_id)
-                .maybeSingle();
-              parentName = parentUser?.full_name || '';
-            }
-
-            if (payment.students?.user_id) {
-              const { data: studentUser } = await supabase
-                .from('school_users')
-                .select('full_name')
-                .eq('id', payment.students.user_id)
-                .maybeSingle();
-              studentName = studentUser?.full_name || '';
-            }
-
-            return {
-              ...payment,
-              school_name: payment.schools?.name,
-              parent_name: parentName,
-              student_name: studentName
-            };
-          })
-        );
-
-        setPayments(enrichedPayments);
-        calculateStats(enrichedPayments);
-      }
-    } catch (error) {
-      console.error('Error loading payments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const calculateStats = (paymentsData: Payment[]) => {
     const completed = paymentsData.filter(p => p.status === 'completed');
@@ -139,10 +244,6 @@ export function PaymentsManager() {
         return <Clock className="w-5 h-5 text-slate-500" />;
     }
   };
-
-  if (loading) {
-    return <div className="text-center py-8 text-slate-600">Loading payments...</div>;
-  }
 
   return (
     <div>

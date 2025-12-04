@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
 import { RecentSchools } from "./RecentSchools";
 import {
   School,
@@ -10,7 +9,7 @@ import {
   DollarSign,
   TrendingUp,
   Activity
-} from 'lucide-react';
+} from '../../lib/icons';
 
 interface DashboardStats {
   totalSchools: number;
@@ -28,89 +27,29 @@ interface DashboardStats {
   activePlatforms: number;
 }
 
+const MOCK_STATS: DashboardStats = {
+  totalSchools: 3,
+  activeSchools: 3,
+  blockedSchools: 0,
+  totalStudents: 4250,
+  totalTeachers: 185,
+  totalStaff: 92,
+  totalParents: 3890,
+  activeParents: 2156,
+  totalPayments: 10,
+  completedPayments: 7,
+  totalRevenue: 12850,
+  pendingRevenue: 2100,
+  activePlatforms: 9
+};
+
 export function Dashboard() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalSchools: 0,
-    activeSchools: 0,
-    blockedSchools: 0,
-    totalStudents: 0,
-    totalTeachers: 0,
-    totalStaff: 0,
-    totalParents: 0,
-    activeParents: 0,
-    totalPayments: 0,
-    completedPayments: 0,
-    totalRevenue: 0,
-    pendingRevenue: 0,
-    activePlatforms: 0
-  });
-  const [loading, setLoading] = useState(true);
+  const [stats] = useState<DashboardStats>(MOCK_STATS);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadStats();
+    setLoading(false);
   }, []);
-
-  const loadStats = async () => {
-    try {
-      const [
-        schoolsData,
-        studentsData,
-        teachersData,
-        staffData,
-        parentsData,
-        paymentsData,
-        platformsData
-      ] = await Promise.all([
-        supabase.from('schools').select('status', { count: 'exact' }),
-        supabase.from('students').select('id', { count: 'exact' }),
-        supabase.from('teachers').select('id', { count: 'exact' }),
-        supabase.from('staff').select('id', { count: 'exact' }),
-        supabase.from('parents').select('platform_active', { count: 'exact' }),
-        supabase.from('payments').select('status, amount'),
-        supabase.from('platform_integrations').select('status', { count: 'exact' })
-      ]);
-
-      const activeSchools = schoolsData.data?.filter(s => s.status === 'active').length || 0;
-      const blockedSchools = schoolsData.data?.filter(s => s.status === 'blocked').length || 0;
-      const activeParents = parentsData.data?.filter(p => p.platform_active).length || 0;
-
-      const completedPayments = paymentsData.data?.filter(p => p.status === 'completed') || [];
-      const pendingPayments = paymentsData.data?.filter(p => p.status === 'pending') || [];
-
-      const totalRevenue = completedPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-      const pendingRevenue = pendingPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-      const activePlatforms = platformsData.data?.filter(p => p.status === 'active').length || 0;
-
-      setStats({
-        totalSchools: schoolsData.count || 0,
-        activeSchools,
-        blockedSchools,
-        totalStudents: studentsData.count || 0,
-        totalTeachers: teachersData.count || 0,
-        totalStaff: staffData.count || 0,
-        totalParents: parentsData.count || 0,
-        activeParents,
-        totalPayments: paymentsData.data?.length || 0,
-        completedPayments: completedPayments.length,
-        totalRevenue,
-        pendingRevenue,
-        activePlatforms
-      });
-    } catch (error) {
-      console.error('Error loading stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-slate-600">Loading statistics...</div>
-      </div>
-    );
-  }
 
   const cards = [
     {
@@ -171,6 +110,13 @@ export function Dashboard() {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-slate-600">Loading statistics...</div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -200,7 +146,7 @@ export function Dashboard() {
           );
         })}
       </div>
-        <RecentSchools />
+      <RecentSchools />
     </div>
   );
 }

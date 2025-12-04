@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Building2, Search, Eye, Ban, Trash2, GraduationCap } from "lucide-react";
+import { Building2, Search, Eye, Ban, Trash2, GraduationCap } from "../../lib/icons";
 
 type School = {
   staffCount: ReactNode;

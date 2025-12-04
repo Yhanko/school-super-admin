@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye } from "../lib/icons";
 import { Teacher } from "../types/teacher";
 
 type TeacherTableProps = {

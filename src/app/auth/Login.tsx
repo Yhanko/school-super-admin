@@ -1,33 +1,49 @@
 import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn } from '../../lib/icons';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { authSchema, AuthSchema } from "../../services/schema/auth";
+import { useNavigate } from 'react-router-dom';
+import api, { AxiosError } from '../../services/api/axios';
+import { useUserStore } from "../../contexts/AuthContext";
+
 
 export function Login() {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    reset,
+  } = useForm<AuthSchema>({
+    resolver: zodResolver(authSchema),
+  });
 
+  const onSubmit = async (data: AuthSchema) => {
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password, fullName);
-        if (error) throw error;
-      } else {
-        const { error } = await signIn(email, password);
-        if (error) throw error;
+        
+        navigate('/dashboard');
+        setLoading(true);
+        const response = await api.post("/auth/login", {
+          fullName: data.fullName!,
+          email: data.email,
+          password: data.password,
+        });
+
+        if(response.status === 200){
+          setLoading(false);
+          reset()
+          const dataResponse = response.data;
+          navigate('/dashboard');
+          useUserStore.getState().setUser(dataResponse.user);
+        }
+
+   } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        console.log(err.response?.data.message);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
+       setLoading(false);
     }
   };
 
@@ -42,82 +58,65 @@ export function Login() {
           <p className="text-slate-600 mt-2">Super Admin Platform</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isSignUp && (
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
-                required
-              />
-            </div>
-          )}
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              {...register('fullName')}
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Email
             </label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register('email')}
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
               required
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Password
             </label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register('password')}
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
               required
-            />
+              />
           </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-
           <button
             type="submit"
             disabled={loading}
+            onClick={() =>  navigate('/dashboard')}
             className="w-full bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               'Loading...'
-            ) : (
-              <>
-                {isSignUp ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
-                {isSignUp ? 'Sign Up' : 'Sign In'}
-              </>
-            )}
+              ) : (
+                <>
+                  <LogIn className="w-5 h-5" />
+                  Sign In
+                </>
+              )}
           </button>
         </form>
-
         <div className="mt-6 text-center">
           <button
-            onClick={() => {
-              setIsSignUp(!isSignUp);
-              setError('');
+            onClick={() => {;
             }}
-            className="text-slate-600 hover:text-slate-900 text-sm transition"
-          >
-            {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
-          </button>
+              className="text-slate-600 hover:text-slate-900 text-sm transition"
+            >
+              "Don't have an account? Sign Up"
+            </button>
         </div>
-      </div>
-    </div>
-  );
-}
+  </div>
+</div>
+)}
