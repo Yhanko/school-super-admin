@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Activity, Smartphone, Globe, Monitor, Server, Users, Clock } from 'lucide-react';
+import { Activity, Users, Clock, Smartphone, Globe, Monitor, Zap } from 'lucide-react';
 
 interface Platform {
   id: string;
@@ -13,60 +12,163 @@ interface Platform {
   created_at: string;
 }
 
-interface PlatformWithSchool extends Platform {
+interface PlatformWithDetails extends Platform {
   school_name?: string;
 }
 
+interface School {
+  id: string;
+  name: string;
+}
+
+const MOCK_SCHOOLS: School[] = [
+  { id: 'sch_001', name: 'Lincoln High School' },
+  { id: 'sch_002', name: 'Washington Academy' },
+  { id: 'sch_003', name: 'Central Elementary' }
+];
+
+const MOCK_PLATFORMS: PlatformWithDetails[] = [
+  {
+    id: 'plat_001',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    platform_name: 'StudentHub Mobile',
+    platform_type: 'mobile',
+    status: 'active',
+    active_users_count: 1245,
+    last_sync: '2024-12-03T14:30:00Z',
+    created_at: '2024-01-15T08:00:00Z'
+  },
+  {
+    id: 'plat_002',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    platform_name: 'StudentHub Web',
+    platform_type: 'web',
+    status: 'active',
+    active_users_count: 2150,
+    last_sync: '2024-12-03T14:25:00Z',
+    created_at: '2024-01-10T10:00:00Z'
+  },
+  {
+    id: 'plat_003',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    platform_name: 'Teacher Dashboard',
+    platform_type: 'web',
+    status: 'active',
+    active_users_count: 85,
+    last_sync: '2024-12-03T13:50:00Z',
+    created_at: '2024-02-01T09:00:00Z'
+  },
+  {
+    id: 'plat_004',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    platform_name: 'WA Mobile App',
+    platform_type: 'mobile',
+    status: 'active',
+    active_users_count: 890,
+    last_sync: '2024-12-03T14:28:00Z',
+    created_at: '2024-03-20T11:00:00Z'
+  },
+  {
+    id: 'plat_005',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    platform_name: 'Parent Portal',
+    platform_type: 'web',
+    status: 'maintenance',
+    active_users_count: 0,
+    last_sync: '2024-12-02T10:00:00Z',
+    created_at: '2024-03-25T14:00:00Z'
+  },
+  {
+    id: 'plat_006',
+    school_id: 'sch_002',
+    school_name: 'Washington Academy',
+    platform_name: 'WA API Service',
+    platform_type: 'api',
+    status: 'active',
+    active_users_count: 45,
+    last_sync: '2024-12-03T14:32:00Z',
+    created_at: '2024-04-01T08:00:00Z'
+  },
+  {
+    id: 'plat_007',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    platform_name: 'CE Mobile',
+    platform_type: 'mobile',
+    status: 'active',
+    active_users_count: 560,
+    last_sync: '2024-12-03T14:20:00Z',
+    created_at: '2024-05-10T09:30:00Z'
+  },
+  {
+    id: 'plat_008',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    platform_name: 'CE Desktop Admin',
+    platform_type: 'desktop',
+    status: 'active',
+    active_users_count: 12,
+    last_sync: '2024-12-03T14:15:00Z',
+    created_at: '2024-05-15T10:00:00Z'
+  },
+  {
+    id: 'plat_009',
+    school_id: 'sch_003',
+    school_name: 'Central Elementary',
+    platform_name: 'CE Web Portal',
+    platform_type: 'web',
+    status: 'inactive',
+    active_users_count: 0,
+    last_sync: '2024-11-20T08:00:00Z',
+    created_at: '2024-06-01T12:00:00Z'
+  },
+  {
+    id: 'plat_010',
+    school_id: 'sch_001',
+    school_name: 'Lincoln High School',
+    platform_name: 'LHS Analytics API',
+    platform_type: 'api',
+    status: 'active',
+    active_users_count: 28,
+    last_sync: '2024-12-03T14:35:00Z',
+    created_at: '2024-06-10T15:00:00Z'
+  }
+];
+
 export function PlatformsManager() {
-  const [platforms, setPlatforms] = useState<PlatformWithSchool[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedSchool, setSelectedSchool] = useState<string>('all');
-  const [schools, setSchools] = useState<{ id: string; name: string }[]>([]);
+  const [platforms, setPlatforms] = useState<PlatformWithDetails[]>([]);
+  const [selectedSchool, setSelectedSchool] = useState('all');
+  const [stats, setStats] = useState({
+    active: 0,
+    totalUsers: 0,
+    maintenance: 0
+  });
 
   useEffect(() => {
-    loadSchools();
-    loadPlatforms();
+    setPlatforms(MOCK_PLATFORMS);
+    calculateStats(MOCK_PLATFORMS);
   }, []);
 
-  const loadSchools = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('id, name')
-        .order('name');
+  const calculateStats = (platformsData: PlatformWithDetails[]) => {
+    const active = platformsData.filter(p => p.status === 'active').length;
+    const maintenance = platformsData.filter(p => p.status === 'maintenance').length;
+    const totalUsers = platformsData.reduce((sum, p) => sum + p.active_users_count, 0);
 
-      if (error) throw error;
-      if (data) setSchools(data);
-    } catch (error) {
-      console.error('Error loading schools:', error);
-    }
+    setStats({
+      active,
+      totalUsers,
+      maintenance
+    });
   };
 
-  const loadPlatforms = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('platform_integrations')
-        .select(`
-          *,
-          schools (name)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (data) {
-        const platformsWithSchool = data.map((platform: any) => ({
-          ...platform,
-          school_name: platform.schools?.name
-        }));
-        setPlatforms(platformsWithSchool);
-      }
-    } catch (error) {
-      console.error('Error loading platforms:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const filteredPlatforms = selectedSchool === 'all'
+    ? platforms
+    : platforms.filter(p => p.school_id === selectedSchool);
 
   const getPlatformIcon = (type: string) => {
     switch (type) {
@@ -77,7 +179,7 @@ export function PlatformsManager() {
       case 'desktop':
         return <Monitor className="w-6 h-6" />;
       case 'api':
-        return <Server className="w-6 h-6" />;
+        return <Zap className="w-6 h-6" />;
       default:
         return <Activity className="w-6 h-6" />;
     }
@@ -86,29 +188,15 @@ export function PlatformsManager() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'inactive':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-green-50 border-green-200 text-green-700';
       case 'maintenance':
-        return 'bg-amber-100 text-amber-700 border-amber-200';
+        return 'bg-amber-50 border-amber-200 text-amber-700';
+      case 'inactive':
+        return 'bg-slate-50 border-slate-200 text-slate-700';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-slate-50 border-slate-200 text-slate-700';
     }
   };
-
-  const filteredPlatforms = selectedSchool === 'all'
-    ? platforms
-    : platforms.filter(p => p.school_id === selectedSchool);
-
-  const totalActiveUsers = platforms
-    .filter(p => p.status === 'active')
-    .reduce((sum, p) => sum + p.active_users_count, 0);
-
-  const activePlatforms = platforms.filter(p => p.status === 'active').length;
-
-  if (loading) {
-    return <div className="text-center py-8 text-slate-600">Loading platforms...</div>;
-  }
 
   return (
     <div>
@@ -123,7 +211,7 @@ export function PlatformsManager() {
             <Activity className="w-5 h-5 text-green-500" />
             <h3 className="text-sm font-medium text-slate-600">Active Platforms</h3>
           </div>
-          <p className="text-2xl font-bold text-slate-900">{activePlatforms}</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
           <p className="text-xs text-slate-500 mt-1">of {platforms.length} total</p>
         </div>
 
@@ -132,7 +220,7 @@ export function PlatformsManager() {
             <Users className="w-5 h-5 text-blue-500" />
             <h3 className="text-sm font-medium text-slate-600">Total Active Users</h3>
           </div>
-          <p className="text-2xl font-bold text-slate-900">{totalActiveUsers.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-slate-900">{stats.totalUsers.toLocaleString()}</p>
           <p className="text-xs text-slate-500 mt-1">across all platforms</p>
         </div>
 
@@ -141,9 +229,7 @@ export function PlatformsManager() {
             <Clock className="w-5 h-5 text-amber-500" />
             <h3 className="text-sm font-medium text-slate-600">Maintenance</h3>
           </div>
-          <p className="text-2xl font-bold text-slate-900">
-            {platforms.filter(p => p.status === 'maintenance').length}
-          </p>
+          <p className="text-2xl font-bold text-slate-900">{stats.maintenance}</p>
           <p className="text-xs text-slate-500 mt-1">platforms under maintenance</p>
         </div>
       </div>
@@ -157,7 +243,7 @@ export function PlatformsManager() {
             className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
           >
             <option value="all">All Schools</option>
-            {schools.map(school => (
+            {MOCK_SCHOOLS.map(school => (
               <option key={school.id} value={school.id}>{school.name}</option>
             ))}
           </select>
@@ -231,7 +317,7 @@ export function PlatformsManager() {
         <h3 className="text-lg font-bold text-slate-900 mb-4">Platform Types Distribution</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {['mobile', 'web', 'desktop', 'api'].map(type => {
-            const count = platforms.filter(p => p.platform_type === type).length;
+            const count = platforms.filter(p => p.platform_type === type as any).length;
             return (
               <div key={type} className="text-center p-4 bg-slate-50 rounded-lg">
                 <div className="flex justify-center mb-2">

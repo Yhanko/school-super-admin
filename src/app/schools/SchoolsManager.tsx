@@ -1,11 +1,62 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
 import {
   School,
   Plus,
   X,
 } from 'lucide-react';
 import { SchoolsList } from "./Shools"
+
+// Dados fictícios para simular a resposta do Supabase
+const mockSchools: School[] = [
+  {
+    id: 'sch-001',
+    name: 'Escola Fictícia Primária',
+    code: 'EFP001',
+    status: 'active',
+    email: 'contato@efp001.com',
+    phone: '5511987654321',
+    address: 'Rua das Flores, 123',
+    max_students: 1500,
+    max_teachers: 150,
+    max_staff: 75,
+    subscription_plan: 'premium',
+    subscription_expires_at: '2026-12-31T00:00:00Z',
+    created_at: '2024-01-15T10:00:00Z',
+  },
+  {
+    id: 'sch-002',
+    name: 'Colégio Fictício Secundário',
+    code: 'CFS002',
+    status: 'blocked',
+    email: 'contato@cfs002.com',
+    phone: null,
+    address: 'Avenida Principal, 456',
+    max_students: 800,
+    max_teachers: 80,
+    max_staff: 40,
+    subscription_plan: 'basic',
+    subscription_expires_at: '2025-06-30T00:00:00Z',
+    created_at: '2024-02-20T12:30:00Z',
+  },
+  {
+    id: 'sch-003',
+    name: 'Centro de Ensino Fictício',
+    code: 'CEF003',
+    status: 'inactive',
+    email: 'contato@cef003.com',
+    phone: '5521912345678',
+    address: 'Praça da Liberdade, 789',
+    max_students: 2000,
+    max_teachers: 200,
+    max_staff: 100,
+    subscription_plan: 'standard',
+    subscription_expires_at: '2025-10-01T00:00:00Z',
+    created_at: '2023-11-05T08:00:00Z',
+  },
+];
+
+// Simulação de um banco de dados em memória para o CRUD
+let schoolsData: School[] = [...mockSchools];
 
 interface School {
   id: string;
@@ -34,6 +85,7 @@ export function SchoolsManager() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
+  const [, setSchools] = useState<School[]>([]); // Novo estado para a lista de escolas
 
   const [formData, setFormData] = useState({
     name: '',
@@ -51,75 +103,88 @@ export function SchoolsManager() {
     loadSchools();
   }, []);
 
+  // Função fictícia para simular o carregamento de escolas
   const loadSchools = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('schools')
-        .select('*')
-        .order('created_at', { ascending: false });
+    console.log('Simulando carregamento de escolas...');
+    setLoading(true);
+    // Simula um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (error) throw error;
+    try {
+      // Retorna os dados do "banco de dados" em memória
+      const data = schoolsData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
       if (data) {
-        console.log(data);
+        console.log('Escolas carregadas (fictícias):', data);
+        setSchools(data); // Atualiza o estado com os dados fictícios
         await loadSchoolStats(data.map(s => s.id));
       }
     } catch (error) {
-      console.error('Error loading schools:', error);
+      console.error('Erro simulado ao carregar escolas:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  // Função fictícia para simular o carregamento de estatísticas
   const loadSchoolStats = async (schoolIds: string[]) => {
+    console.log('Simulando carregamento de estatísticas para IDs:', schoolIds);
+    // Simula um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     const stats: Record<string, SchoolStats> = {};
 
     for (const schoolId of schoolIds) {
-      const [students, teachers, staff, parents] = await Promise.all([
-        supabase.from('students').select('id', { count: 'exact' }).eq('school_id', schoolId),
-        supabase.from('teachers').select('id', { count: 'exact' }).eq('school_id', schoolId),
-        supabase.from('staff').select('id', { count: 'exact' }).eq('school_id', schoolId),
-        supabase.from('parents').select('id', { count: 'exact' }).eq('school_id', schoolId)
-      ]);
-
-      stats[schoolId] = {
-        students: students.count || 0,
-        teachers: teachers.count || 0,
-        staff: staff.count || 0,
-        parents: parents.count || 0
+      // Dados fictícios de estatísticas
+      const mockStats: SchoolStats = {
+        students: Math.floor(Math.random() * 1000) + 100,
+        teachers: Math.floor(Math.random() * 50) + 10,
+        staff: Math.floor(Math.random() * 20) + 5,
+        parents: Math.floor(Math.random() * 1500) + 200,
       };
+      stats[schoolId] = mockStats;
     }
 
-    console.log(stats);
+    console.log('Estatísticas carregadas (fictícias):', stats);
+    // Nota: O componente original apenas logava as estatísticas.
+    // Se a SchoolsList precisar delas, será necessário um novo estado e passar via props.
   };
 
+  // Função fictícia para simular o envio do formulário (CRUD)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log('Simulando salvamento de escola com dados:', formData);
+    // Simula um atraso de rede
+    await new Promise(resolve => setTimeout(resolve, 700));
+
     try {
       if (editingSchool) {
-        const { error } = await supabase
-          .from('schools')
-          .update({
-            ...formData,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingSchool.id);
-
-        if (error) throw error;
+        // Simula a atualização
+        schoolsData = schoolsData.map(s =>
+          s.id === editingSchool.id
+            ? { ...s, ...formData, updated_at: new Date().toISOString() }
+            : s
+        );
+        console.log('Escola atualizada (fictícia).');
       } else {
-        const { error } = await supabase
-          .from('schools')
-          .insert([formData]);
-
-        if (error) throw error;
+        // Simula a inserção
+        const newSchool: School = {
+          ...formData,
+          id: `sch-${Date.now()}`, // ID fictício
+          status: 'active',
+          subscription_expires_at: '2026-12-31T00:00:00Z',
+          created_at: new Date().toISOString(),
+        };
+        schoolsData.push(newSchool);
+        console.log('Escola criada (fictícia):', newSchool);
       }
 
       resetForm();
-      loadSchools();
+      loadSchools(); // Recarrega a lista fictícia
     } catch (error) {
-      console.error('Error saving school:', error);
-      alert('Error saving school. Please try again.');
+      console.error('Erro simulado ao salvar escola:', error);
+      alert('Erro simulado ao salvar escola. Tente novamente.');
     }
   };
 
@@ -158,6 +223,7 @@ export function SchoolsManager() {
           Add School
         </button>
       </div>
+      {/* Passando a lista de escolas fictícias para o componente SchoolsList */}
       <SchoolsList />
 
       {showModal && (
@@ -226,11 +292,11 @@ export function SchoolsManager() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-                <textarea
+                <input
+                type='text'
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                  rows={3}
                 />
               </div>
 
@@ -289,6 +355,22 @@ export function SchoolsManager() {
                   <option value="premium">Premium</option>
                   <option value="enterprise">Enterprise</option>
                 </select>
+              </div>
+
+              <div className='space-y-4'>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Senha
+                </label>
+                <input
+                  type="password"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                  placeholder='Insira a senha'
+                />
+                <input
+                  type="password"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                  placeholder='Confirme a senha'
+                />
               </div>
 
               <div className="flex gap-3 pt-4">

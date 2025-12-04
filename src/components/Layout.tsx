@@ -1,5 +1,5 @@
-import { ReactNode, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from "react";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import {
   LayoutDashboard,
   School,
@@ -10,35 +10,27 @@ import {
   X,
   Users2,
   Parentheses,
-  UserCircle2
-} from 'lucide-react';
+  UserCircle2,
+} from "lucide-react";
 
-interface LayoutProps {
-  children: ReactNode;
-  currentView: string;
-  onViewChange: (view: string) => void;
-}
-
-export function Layout({ children, currentView, onViewChange }: LayoutProps) {
-  const { user, signOut } = useAuth();
+export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', icon: LayoutDashboard, view: 'dashboard' },
-    { name: 'Schools', icon: School, view: 'schools' },
-    { name: 'Students', icon: Users2, view: 'students' },
-    { name: 'Parents', icon: Parentheses, view: 'parents' },
-    { name: 'Teachers', icon: UserCircle2, view: 'teachers' },
-    { name: 'Payments', icon: DollarSign, view: 'payments' },
-    { name: 'Platforms', icon: Activity, view: 'platforms' },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+    { name: "Schools", icon: School, path: "/schools" },
+    { name: "Students", icon: Users2, path: "/students" },
+    { name: "Parents", icon: Parentheses, path: "/parents" },
+    { name: "Teachers", icon: UserCircle2, path: "/teachers" },
+    { name: "Payments", icon: DollarSign, path: "/payments" },
+    { name: "Platforms", icon: Activity, path: "/platforms" },
   ];
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Top bar mobile */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-50 px-4 py-3">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-slate-900">Administrador geral</h1>
@@ -51,9 +43,10 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
         </div>
       </div>
 
+      {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
@@ -65,18 +58,18 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
           <nav className="flex-1 p-4 space-y-2">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = currentView === item.view;
+              const isActive = location.pathname === item.path;
               return (
                 <button
                   key={item.name}
                   onClick={() => {
-                    onViewChange(item.view);
+                    navigate(item.path);
                     setSidebarOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     isActive
-                      ? 'bg-slate-800 text-white'
-                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      ? "bg-slate-800 text-white"
+                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -87,12 +80,11 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
           </nav>
 
           <div className="p-4 border-t border-slate-800">
-            <div className="mb-3 px-4 py-2 bg-slate-800 rounded-lg">
-              <p className="text-xs text-slate-400">Signed in as</p>
-              <p className="text-sm text-white font-medium truncate">{user?.email}</p>
-            </div>
             <button
-              onClick={handleSignOut}
+              onClick={() => {
+                // Logout Zustand
+                navigate("/");
+              }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
             >
               <LogOut className="w-5 h-5" />
@@ -109,9 +101,10 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
         />
       )}
 
+      {/* Main content */}
       <div className="lg:pl-64 pt-16 lg:pt-0">
         <main className="p-6 lg:p-8">
-          {children}
+          <Outlet/>
         </main>
       </div>
     </div>
