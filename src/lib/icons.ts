@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Lock,
   School,
   DollarSign,
   Activity,
@@ -41,6 +42,7 @@ export {
   LogOut,
   Menu,
   X,
+  Lock,
   Users2,
   User,
   SquareUser,

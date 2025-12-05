@@ -1,5 +1,5 @@
 import { ReactNode, useState } from "react";
-import { Building2, Search, Eye, Ban, Trash2, GraduationCap } from "../../lib/icons";
+import { Building2, Search, Eye, Ban, Trash2, GraduationCap, Lock, Clock, User, X } from "../../lib/icons";
 
 type School = {
   staffCount: ReactNode;
@@ -14,6 +14,12 @@ type School = {
   studentsCount: number;
   teachersCount: number;
   monthlyRevenue: number;
+  // Novos campos para detalhes
+  created_at: string;
+  last_login: string | null;
+  subscription_plan: 'basic' | 'standard' | 'premium' | 'enterprise';
+  subscription_expires_at: string;
+  login_history: { timestamp: string, ip: string, action: 'login' | 'logout' }[];
 };
 
 const mockSchools: School[] = [
@@ -22,36 +28,205 @@ const mockSchools: School[] = [
       name: "Dom Bosco",
       code: "001",
       director: "Padre",
-      address: "Rua A",
+      address: "Rua A, 123 - Centro",
       phone: "99999-0000",
       email: "contato@escolacentral.edu",
       status: "active",
       studentsCount: 850,
       teachersCount: 45,
-      monthlyRevenue: 1250,
-      staffCount: 50
+      monthlyRevenue: 125000,
+      staffCount: 50,
+      created_at: "2023-01-15T10:00:00Z",
+      last_login: "2024-12-05T14:30:00Z",
+      subscription_plan: 'premium',
+      subscription_expires_at: '2025-12-31T00:00:00Z',
+      login_history: [
+        { timestamp: "2024-12-05T14:30:00Z", ip: "203.0.113.45", action: 'login' },
+        { timestamp: "2024-12-05T10:15:00Z", ip: "203.0.113.45", action: 'logout' },
+        { timestamp: "2024-12-04T09:00:00Z", ip: "198.51.100.10", action: 'login' },
+      ]
   },
   {
       id: "s2",
       name: "Escola Norte",
       code: "002",
       director: "João Silva",
-      address: "Av.456",
+      address: "Av.456, Bairro Novo",
       phone: "98888-1111",
       email: "contato@escolanorte.edu",
       status: "blocked",
       studentsCount: 600,
       teachersCount: 30,
       monthlyRevenue: 90000,
-      staffCount: 90
+      staffCount: 90,
+      created_at: "2022-08-20T12:30:00Z",
+      last_login: "2023-05-10T08:00:00Z",
+      subscription_plan: 'basic',
+      subscription_expires_at: '2024-06-30T00:00:00Z',
+      login_history: [
+        { timestamp: "2023-05-10T08:00:00Z", ip: "192.0.2.1", action: 'login' },
+        { timestamp: "2023-05-09T17:00:00Z", ip: "192.0.2.1", action: 'logout' },
+      ]
   }
 ];
+
+// Componente de Detalhes da Escola (Modal)
+interface SchoolDetailsModalProps {
+    school: School;
+    onClose: () => void;
+}
+
+const SchoolDetailsModal = ({ school, onClose }: SchoolDetailsModalProps) => {
+    const [activeTab, setActiveTab] = useState<'info' | 'security' | 'logs'>('info');
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const InfoTab = () => (
+        <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-slate-800">Informações Gerais</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><span className="font-medium">Código:</span> {school.code}</p>
+                <p><span className="font-medium">Diretor:</span> {school.director || 'N/A'}</p>
+                <p><span className="font-medium">E-mail:</span> {school.email || 'N/A'}</p>
+                <p><span className="font-medium">Telefone:</span> {school.phone || 'N/A'}</p>
+                <p className="col-span-2"><span className="font-medium">Endereço:</span> {school.address || 'N/A'}</p>
+            </div>
+
+            <h4 className="text-lg font-semibold text-slate-800 pt-4">Plano e Status</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+                <p><span className="font-medium">Plano de Assinatura:</span> <span className="capitalize">{school.subscription_plan}</span></p>
+                <p><span className="font-medium">Expira em:</span> {formatDate(school.subscription_expires_at)}</p>
+                <p><span className="font-medium">Status:</span> <span className={`font-bold capitalize ${school.status === 'active' ? 'text-green-600' : 'text-red-600'}`}>{school.status}</span></p>
+                <p><span className="font-medium">Criada em:</span> {formatDate(school.created_at)}</p>
+            </div>
+
+            <h4 className="text-lg font-semibold text-slate-800 pt-4">Estatísticas de Capacidade</h4>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+                <p><span className="font-medium">Alunos:</span> {school.studentsCount}</p>
+                <p><span className="font-medium">Professores:</span> {school.teachersCount}</p>
+                <p><span className="font-medium">Funcionários:</span> {school.staffCount}</p>
+            </div>
+        </div>
+    );
+
+    const SecurityTab = () => (
+        <div className="space-y-6">
+            <h4 className="text-lg font-semibold text-slate-800">Alteração de Senha (Diretor/Admin)</h4>
+            <form className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Nova Senha</label>
+                    <input type="password" placeholder="Insira a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Confirmar Nova Senha</label>
+                    <input type="password" placeholder="Confirme a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                </div>
+                <button type="submit" className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-800 transition">
+                    Alterar Senha
+                </button>
+            </form>
+
+            <h4 className="text-lg font-semibold text-slate-800 pt-4">Segurança da Conta</h4>
+            <p className="text-sm text-slate-600">
+                <span className="font-medium">Último Login:</span> {formatDate(school.last_login)}
+            </p>
+            <p className="text-sm text-slate-600">
+                <span className="font-medium">Status de Bloqueio:</span> {school.status === 'blocked' ? 'Bloqueada' : 'Ativa'}
+            </p>
+        </div>
+    );
+
+    const LogsTab = () => (
+        <div className="space-y-4">
+            <h4 className="text-lg font-semibold text-slate-800">Histórico de Login/Logout</h4>
+            <div className="max-h-60 overflow-y-auto border border-slate-200 rounded-lg p-3">
+                {school.login_history.length > 0 ? (
+                    school.login_history.map((log, index) => (
+                        <div key={index} className={`flex justify-between items-center p-2 ${index % 2 === 0 ? 'bg-slate-50' : 'bg-white'} rounded-md`}>
+                            <div className="flex items-center space-x-2">
+                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${log.action === 'login' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                    {log.action.toUpperCase()}
+                                </span>
+                                <span className="text-sm text-slate-700">{formatDate(log.timestamp)}</span>
+                            </div>
+                            <span className="text-xs text-slate-500">IP: {log.ip}</span>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-sm text-slate-500 text-center py-4">Nenhum registro de login encontrado.</p>
+                )}
+            </div>
+        </div>
+    );
+
+    const tabs = [
+        { id: 'info', label: 'Informações Pessoais', icon: User, component: InfoTab },
+        { id: 'security', label: 'Segurança e Senha', icon: Lock, component: SecurityTab },
+        { id: 'logs', label: 'Logs de Acesso', icon: Clock, component: LogsTab },
+    ];
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white z-10">
+                    <h3 className="text-2xl font-bold text-slate-900">
+                        Detalhes da Escola: {school.name}
+                    </h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                {/* Tabs Navigation */}
+                <div className="border-b border-slate-200 px-6 pt-2 sticky top-[77px] bg-white z-10">
+                    <nav className="-mb-px flex space-x-8">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as 'info' | 'security' | 'logs')}
+                                className={`
+                                    flex items-center space-x-2 py-3 px-1 text-sm font-medium transition-colors
+                                    ${activeTab === tab.id
+                                        ? 'border-b-2 border-slate-900 text-slate-900'
+                                        : 'border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                                    }
+                                `}
+                            >
+                                <tab.icon className="w-4 h-4" />
+                                <span>{tab.label}</span>
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+
+                {/* Tabs Content */}
+                <div className="p-6">
+                    {activeTab === 'info' && <InfoTab />}
+                    {activeTab === 'security' && <SecurityTab />}
+                    {activeTab === 'logs' && <LogsTab />}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- SchoolsList Component ---
 
 export function SchoolsList() {
   const [schools, setSchools] = useState<School[]>(mockSchools);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [actionType, setActionType] = useState<"block" | "delete" | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false); // Novo estado para o modal de detalhes
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,6 +242,11 @@ export function SchoolsList() {
   const handleDeleteSchool = (school: School) => {
     setSelectedSchool(school);
     setActionType("delete");
+  };
+
+  const handleViewDetails = (school: School) => {
+    setSelectedSchool(school);
+    setShowDetailsModal(true);
   };
 
   const confirmAction = () => {
@@ -93,10 +273,13 @@ export function SchoolsList() {
   };
 
   const getStatusBadge = (status: School["status"]) => {
+    // Nota: As classes 'default', 'destructive', 'secondary' não estão definidas aqui.
+    // Assumindo que são classes Tailwind ou de um framework de componentes (shadcn/ui, etc.)
+    // Vou usar classes Tailwind simples para simular.
     const variants = {
-      active: { variant: "default" as const, label: "Ativa" },
-      blocked: { variant: "destructive" as const, label: "Bloqueada" },
-      inactive: { variant: "secondary" as const, label: "Inativa" }
+      active: { className: "bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Ativa" },
+      blocked: { className: "bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Bloqueada" },
+      inactive: { className: "bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Inativa" }
     };
     return variants[status];
   };
@@ -118,7 +301,7 @@ export function SchoolsList() {
           <div>
             <div className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="text-sm font-medium">Escolas Bloqueadas</div>
-              <Ban className="h-4 w-4 text-destructive" />
+              <Ban className="h-4 w-4 text-red-500" />
             </div>
             <div>
               <div className="text-2xl font-bold">{schools.filter(s => s.status === "blocked").length}</div>
@@ -127,7 +310,7 @@ export function SchoolsList() {
           <div>
             <div className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="text-sm font-medium">Total de Alunos</div>
-              <GraduationCap className="h-4 w-4 text-primary" />
+              <GraduationCap className="h-4 w-4 text-blue-500" />
             </div>
             <div>
               <div className="text-2xl font-bold">{schools.reduce((sum, s) => sum + s.studentsCount, 0)}</div>
@@ -154,19 +337,19 @@ export function SchoolsList() {
             <div className="overflow-x-auto">
               <table className="w-full border-[1px] border-gray-200 rounded-lg">
                 <thead>
-                  <tr className="border-b border-border border-[1px] border-gray-200 rounded-lg bg-muted/50">
-                    <th className="text-left p-4 font-semibold text-foreground">Escola</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Local</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Código</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Status</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Diretor</th>
-                    <th className="text-left p-4 font-semibold text-foreground">Contato</th>
-                    <th className="text-left p-4 font-semibold text-foreground">E-mail</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Alunos</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Professores</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Funcionários</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Receita Mensal</th>
-                    <th className="text-center p-4 font-semibold text-foreground">Ações</th>
+                  <tr className="border-b border-border border-[1px] border-gray-200 rounded-lg bg-gray-50">
+                    <th className="text-left p-4 font-semibold text-slate-700">Escola</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Local</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Código</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Status</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Diretor</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Contato</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">E-mail</th>
+                    <th className="text-center p-4 font-semibold text-slate-700">Alunos</th>
+                    <th className="text-center p-4 font-semibold text-slate-700">Professores</th>
+                    <th className="text-center p-4 font-semibold text-slate-700">Funcionários</th>
+                    <th className="text-center p-4 font-semibold text-slate-700">Receita Mensal</th>
+                    <th className="text-center p-4 font-semibold text-slate-700">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="border-[1px] border-gray-200">
@@ -175,79 +358,79 @@ export function SchoolsList() {
                     return (
                       <tr 
                         key={school.id} 
-                        className="border-b border-border hover:bg-muted/50 transition-colors animate-fade-in"
+                        className="border-b border-border hover:bg-gray-50 transition-colors animate-fade-in"
                         style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                       >
                         <td className="p-4">
                           <div>
-                            <p className="font-semibold text-foreground">{school.name}</p>
+                            <p className="font-semibold text-slate-900">{school.name}</p>
                           </div>
                         </td>
 
                         <td className="p-4">
                           <div>
-                            <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <p className="text-sm text-slate-600 flex items-center gap-1 mt-1">
                               {school.address}
                             </p>
                           </div>
                         </td>
 
                         <td className="p-4">
-                          <span className="font-mono text-sm text-foreground">{school.code}</span>
+                          <span className="font-mono text-sm text-slate-900">{school.code}</span>
                         </td>
                         <td className="p-4">
-                          <span className={statusInfo.variant}>{statusInfo.label}</span>
+                          <span className={statusInfo.className}>{statusInfo.label}</span>
                         </td>
                         <td className="p-4">
-                          <p className="text-sm text-foreground">{school.director}</p>
+                          <p className="text-sm text-slate-900">{school.director}</p>
                         </td>
                         <td className="p-4">
-                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <p className="text-sm text-slate-600 flex items-center gap-1">
                               {school.phone}
                             </p>
                         </td>
                         <td className="p-4">
-                            <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <p className="text-sm text-slate-600 flex items-center gap-1">
                               {school.email}
                             </p>
                         </td>
                         <td className="p-4 text-center">
                           <div className="flex flex-col items-center">
-                            <span className="font-semibold text-foreground">{school.studentsCount}</span>
+                            <span className="font-semibold text-slate-900">{school.studentsCount}</span>
                           </div>
                         </td>
                         <td className="p-4 text-center">
                           <div className="flex flex-col items-center">
-                            <span className="font-semibold text-foreground">{school.teachersCount}</span>
+                            <span className="font-semibold text-slate-900">{school.teachersCount}</span>
                           </div>
                         </td>
                         <td className="p-4 text-center">
                           <div className="flex flex-col items-center">
-                            <span className="font-semibold text-foreground">{school.staffCount}</span>
+                            <span className="font-semibold text-slate-900">{school.staffCount}</span>
                           </div>
                         </td>
                         <td className="p-4 text-center">
                           <div className="flex flex-col items-center">
-                            <span className="font-semibold text-foreground">
-                              {(school.monthlyRevenue / 1000).toFixed(0)}k
+                            <span className="font-semibold text-slate-900">
+                              R$ {(school.monthlyRevenue / 1000).toFixed(0)}k
                             </span>
                           </div>
                         </td>
                         <td className="p-4">
                           <div className="flex gap-2 justify-center">
-                              <button title="Ver detalhes">
-                                <Eye className="h-4 w-4" />
+                              <button title="Ver detalhes" onClick={() => handleViewDetails(school)}>
+                                <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800 transition" />
                               </button>
                             <button
                               onClick={() => handleBlockSchool(school)}
-                              className={school.status === "blocked" ? "text-green-600" : "text-orange-600"}
+                              className={school.status === "blocked" ? "text-green-600 hover:text-green-800 transition" : "text-orange-600 hover:text-orange-800 transition"}
                               title={school.status === "blocked" ? "Desbloquear" : "Bloquear"}
                             >
                               <Ban className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleDeleteSchool(school)}
-                              className="text-destructive"
+                              className="text-red-600 hover:text-red-800 transition"
                               title="Remover escola"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -266,9 +449,9 @@ export function SchoolsList() {
         {filteredSchools.length === 0 && (
           <div className="animate-fade-in">
             <div className="flex flex-col items-center justify-center py-12">
-              <Building2 className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium text-foreground">Nenhuma escola encontrada</p>
-              <p className="text-sm text-muted-foreground">Tente ajustar os filtros de busca</p>
+              <Building2 className="h-12 w-12 text-slate-400 mb-4" />
+              <p className="text-lg font-medium text-slate-900">Nenhuma escola encontrada</p>
+              <p className="text-sm text-slate-600">Tente ajustar os filtros de busca</p>
             </div>
           </div>
         )}
@@ -276,16 +459,16 @@ export function SchoolsList() {
 
       {/* Confirmation Dialog */}
       {selectedSchool && actionType && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-background p-6 rounded-lg shadow-lg w-full max-w-md">
-            <div className="text-lg font-semibold mb-2">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <div className="text-lg font-semibold mb-2 text-slate-900">
               {actionType === "block"
                 ? selectedSchool.status === "blocked"
                   ? "Desbloquear Escola"
                   : "Bloquear Escola"
                 : "Remover Escola"}
             </div>
-            <div className="text-sm text-muted-foreground mb-4">
+            <div className="text-sm text-slate-600 mb-4">
               {actionType === "block"
                 ? selectedSchool.status === "blocked"
                   ? `Tem certeza que deseja desbloquear a escola "${selectedSchool.name}"? A escola voltará a ter acesso total à plataforma.`
@@ -293,13 +476,26 @@ export function SchoolsList() {
                 : `Tem certeza que deseja remover a escola "${selectedSchool.name}"? Esta ação não pode ser desfeita.`}
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={() => { setSelectedSchool(null); setActionType(null); }}>Cancelar</button>
-              <button onClick={confirmAction} className={actionType === "delete" ? "bg-destructive hover:bg-destructive/90" : ""}>
+              <button 
+                onClick={() => { setSelectedSchool(null); setActionType(null); }}
+                className="px-4 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-slate-100 transition"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmAction} 
+                className={`px-4 py-2 text-sm font-medium rounded-lg text-white transition ${actionType === "delete" ? "bg-red-600 hover:bg-red-700" : "bg-slate-900 hover:bg-slate-800"}`}
+              >
                 Confirmar
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* School Details Modal */}
+      {selectedSchool && showDetailsModal && (
+        <SchoolDetailsModal school={selectedSchool} onClose={() => { setShowDetailsModal(false); setSelectedSchool(null); }} />
       )}
     </div>
   );
