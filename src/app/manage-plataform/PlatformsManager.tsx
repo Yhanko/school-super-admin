@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Activity, Users, Clock, Smartphone, Globe, Monitor, Zap } from '../../lib/icons';
+import api from '../../services/api/axios';
 
 interface Platform {
   id: string;
@@ -21,127 +22,9 @@ interface School {
   name: string;
 }
 
-const MOCK_SCHOOLS: School[] = [
-  { id: 'sch_001', name: 'Lincoln High School' },
-  { id: 'sch_002', name: 'Washington Academy' },
-  { id: 'sch_003', name: 'Central Elementary' }
-];
-
-const MOCK_PLATFORMS: PlatformWithDetails[] = [
-  {
-    id: 'plat_001',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    platform_name: 'StudentHub Mobile',
-    platform_type: 'mobile',
-    status: 'active',
-    active_users_count: 1245,
-    last_sync: '2024-12-03T14:30:00Z',
-    created_at: '2024-01-15T08:00:00Z'
-  },
-  {
-    id: 'plat_002',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    platform_name: 'StudentHub Web',
-    platform_type: 'web',
-    status: 'active',
-    active_users_count: 2150,
-    last_sync: '2024-12-03T14:25:00Z',
-    created_at: '2024-01-10T10:00:00Z'
-  },
-  {
-    id: 'plat_003',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    platform_name: 'Teacher Dashboard',
-    platform_type: 'web',
-    status: 'active',
-    active_users_count: 85,
-    last_sync: '2024-12-03T13:50:00Z',
-    created_at: '2024-02-01T09:00:00Z'
-  },
-  {
-    id: 'plat_004',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    platform_name: 'WA Mobile App',
-    platform_type: 'mobile',
-    status: 'active',
-    active_users_count: 890,
-    last_sync: '2024-12-03T14:28:00Z',
-    created_at: '2024-03-20T11:00:00Z'
-  },
-  {
-    id: 'plat_005',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    platform_name: 'Parent Portal',
-    platform_type: 'web',
-    status: 'maintenance',
-    active_users_count: 0,
-    last_sync: '2024-12-02T10:00:00Z',
-    created_at: '2024-03-25T14:00:00Z'
-  },
-  {
-    id: 'plat_006',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    platform_name: 'WA API Service',
-    platform_type: 'api',
-    status: 'active',
-    active_users_count: 45,
-    last_sync: '2024-12-03T14:32:00Z',
-    created_at: '2024-04-01T08:00:00Z'
-  },
-  {
-    id: 'plat_007',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    platform_name: 'CE Mobile',
-    platform_type: 'mobile',
-    status: 'active',
-    active_users_count: 560,
-    last_sync: '2024-12-03T14:20:00Z',
-    created_at: '2024-05-10T09:30:00Z'
-  },
-  {
-    id: 'plat_008',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    platform_name: 'CE Desktop Admin',
-    platform_type: 'desktop',
-    status: 'active',
-    active_users_count: 12,
-    last_sync: '2024-12-03T14:15:00Z',
-    created_at: '2024-05-15T10:00:00Z'
-  },
-  {
-    id: 'plat_009',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    platform_name: 'CE Web Portal',
-    platform_type: 'web',
-    status: 'inactive',
-    active_users_count: 0,
-    last_sync: '2024-11-20T08:00:00Z',
-    created_at: '2024-06-01T12:00:00Z'
-  },
-  {
-    id: 'plat_010',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    platform_name: 'LHS Analytics API',
-    platform_type: 'api',
-    status: 'active',
-    active_users_count: 28,
-    last_sync: '2024-12-03T14:35:00Z',
-    created_at: '2024-06-10T15:00:00Z'
-  }
-];
-
 export function PlatformsManager() {
   const [platforms, setPlatforms] = useState<PlatformWithDetails[]>([]);
+  const [schools, setSchools] = useState<School[]>([]);
   const [selectedSchool, setSelectedSchool] = useState('all');
   const [stats, setStats] = useState({
     active: 0,
@@ -150,9 +33,37 @@ export function PlatformsManager() {
   });
 
   useEffect(() => {
-    setPlatforms(MOCK_PLATFORMS);
-    calculateStats(MOCK_PLATFORMS);
+    loadPlatforms();
   }, []);
+
+  const loadPlatforms = async () => {
+    try {
+      const response = await api.get('/super-admin/platforms');
+      const data = response.data.map((p: any) => ({
+        id: p.id,
+        school_id: p.institution?.id || '',
+        school_name: p.institution?.name || 'Global',
+        platform_name: p.platformName,
+        platform_type: p.platformType,
+        status: p.status,
+        active_users_count: p.activeUsersCount,
+        last_sync: p.lastSync,
+        created_at: p.createdAt
+      }));
+      setPlatforms(data);
+      calculateStats(data);
+      
+      const uniqueSchools = Array.from(new Set(data.map((p: any) => p.school_id)))
+        .filter(Boolean)
+        .map(id => {
+            const platform = data.find((p: any) => p.school_id === id);
+            return { id: id as string, name: platform?.school_name as string };
+        });
+      setSchools(uniqueSchools);
+    } catch (error) {
+      console.error('Failed to load platforms:', error);
+    }
+  };
 
   const calculateStats = (platformsData: PlatformWithDetails[]) => {
     const active = platformsData.filter(p => p.status === 'active').length;
@@ -243,7 +154,7 @@ export function PlatformsManager() {
             className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
           >
             <option value="all">All Schools</option>
-            {MOCK_SCHOOLS.map(school => (
+            {schools.map(school => (
               <option key={school.id} value={school.id}>{school.name}</option>
             ))}
           </select>
@@ -256,14 +167,10 @@ export function PlatformsManager() {
               className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-lg ${
-                  platform.status === 'active' ? 'bg-green-100 text-green-700' :
-                  platform.status === 'maintenance' ? 'bg-amber-100 text-amber-700' :
-                  'bg-slate-100 text-slate-700'
-                }`}>
+                <div className={p-3 rounded-lg \}>
                   {getPlatformIcon(platform.platform_type)}
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(platform.status)}`}>
+                <span className={px-3 py-1 rounded-full text-xs font-medium border \}>
                   {platform.status}
                 </span>
               </div>
@@ -308,7 +215,7 @@ export function PlatformsManager() {
 
         {filteredPlatforms.length === 0 && (
           <div className="text-center py-8 text-slate-500">
-            No platforms found for this school.
+            No platforms found for this criteria.
           </div>
         )}
       </div>

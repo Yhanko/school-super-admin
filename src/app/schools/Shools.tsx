@@ -2,7 +2,6 @@ import { ReactNode, useState } from "react";
 import { Building2, Search, Eye, Ban, Trash2, GraduationCap, Lock, Clock, User, X } from "../../lib/icons";
 
 type School = {
-  staffCount: ReactNode;
   id: string;
   name: string;
   code: string;
@@ -14,10 +13,10 @@ type School = {
   studentsCount: number;
   teachersCount: number;
   monthlyRevenue: number;
-  // Novos campos para detalhes
+  staffCount: number;
   created_at: string;
   last_login: string | null;
-  subscription_plan: 'basic' | 'standard' | 'premium' | 'enterprise';
+  subscription_plan: string;
   subscription_expires_at: string;
   login_history: { timestamp: string, ip: string, action: 'login' | 'logout' }[];
 };
@@ -220,13 +219,44 @@ const SchoolDetailsModal = ({ school, onClose }: SchoolDetailsModalProps) => {
 };
 
 // --- SchoolsList Component ---
+import api from '../../services/api/axios';
+import { useEffect } from 'react';
 
-export function SchoolsList() {
-  const [schools, setSchools] = useState<School[]>(mockSchools);
+export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
+  const [schools, setSchools] = useState<School[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [actionType, setActionType] = useState<"block" | "delete" | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false); // Novo estado para o modal de detalhes
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  useEffect(() => {
+    loadSchools();
+  }, [refreshTrigger]);
+
+  const loadSchools = async () => {
+    try {
+      const response = await api.get('/super-admin/institutions');
+      const formatted = response.data.map((inst: any) => ({
+        id: inst.id,
+        name: inst.name,
+        code: inst.id.substring(0, 6).toUpperCase(),
+        email: inst.email,
+        address: inst.address,
+        status: inst.status,
+        studentsCount: inst.max_students,
+        teachersCount: inst.max_teachers,
+        staffCount: inst.max_staff,
+        subscription_plan: inst.subscription_plan,
+        subscription_expires_at: inst.subscription_expires_at,
+        monthlyRevenue: 0,
+        login_history: [],
+        created_at: inst.createdAt,
+      }));
+      setSchools(formatted);
+    } catch (error) {
+      console.error('Failed to load schools:', error);
+    }
+  };
 
   const filteredSchools = schools.filter(school =>
     school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

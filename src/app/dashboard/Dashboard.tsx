@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { RecentSchools } from "./RecentSchools";
+import { HealthReport } from "./HealthReport";
+import { BroadcastComposer } from "./BroadcastComposer";
 import {
   School,
   Users,
@@ -43,12 +45,45 @@ const MOCK_STATS: DashboardStats = {
   activePlatforms: 9
 };
 
+import api from '../../services/api/axios';
+
 export function Dashboard() {
-  const [stats] = useState<DashboardStats>(MOCK_STATS);
-  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalSchools: 0,
+    activeSchools: 0,
+    blockedSchools: 0,
+    totalStudents: 0,
+    totalTeachers: 0,
+    totalStaff: 0,
+    totalParents: 0,
+    activeParents: 0,
+    totalPayments: 0,
+    completedPayments: 0,
+    totalRevenue: 0,
+    pendingRevenue: 0,
+    activePlatforms: 0
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(false);
+    async function loadStats() {
+      try {
+        const response = await api.get('/super-admin/dashboard');
+        setStats(prev => ({
+          ...prev,
+          totalSchools: response.data.totalSchools,
+          activeSchools: response.data.activeSubscriptions,
+          totalStudents: response.data.totalStudents,
+          totalTeachers: response.data.totalTeachers,
+          totalRevenue: response.data.monthlyRevenue,
+        }));
+      } catch (error) {
+        console.error('Failed to load dashboard metrics', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStats();
   }, []);
 
   const cards = [
@@ -146,7 +181,16 @@ export function Dashboard() {
           );
         })}
       </div>
-      <RecentSchools />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+        <div className="lg:col-span-2">
+          <RecentSchools />
+          <HealthReport />
+        </div>
+        <div className="lg:col-span-1">
+          <BroadcastComposer />
+        </div>
+      </div>
     </div>
   );
 }
+

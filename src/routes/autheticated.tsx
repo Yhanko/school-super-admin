@@ -11,5 +11,5 @@ export function AuthenticatedRoute({ children }: PrivateRouteProps) {
   //const { getToken } = useAuthToken(); 
   const  getToken  = true; 
 
-  return  getToken ? children :<Navigate to="/login"/>;
+  return  getToken ? children :<Navigate to="/"/>;
 }

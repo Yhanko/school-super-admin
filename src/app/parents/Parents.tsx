@@ -1,15 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "../../lib/icons";
 import { Parent } from "../../types/parents";
-import { mockParents } from "../../data/parents";
 import { ParentsTable } from "../../components/ParentsTable";
 import { ParentsModal } from "../../components/ParentsModal";
+import api from "../../services/api/axios";
 
 export function Parents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedParent, setSelectedParent] = useState<Parent | null>(null);
+  const [parents, setParents] = useState<Parent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredParents = mockParents.filter(
+  useEffect(() => {
+    loadParents();
+  }, []);
+
+  const loadParents = async () => {
+    try {
+      const response = await api.get('/super-admin/users?role=PARENT');
+      const formatted = response.data.map((user: any) => ({
+        id: user.id,
+        name: user.name,
+        schoolId: user.institutionId || '',
+        schoolName: user.institution?.name || 'N/A',
+        class: 'N/A', // from relations if existed
+        parentName: user.name,
+        enrollmentDate: new Date(user.createdAt),
+        isActive: true,
+        lastLogin: undefined,
+        attendanceRate: 0,
+        averageGrade: 0,
+        actions: []
+      }));
+      setParents(formatted);
+    } catch (error) {
+      console.error('Failed to load parents:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredParents = parents.filter(
     (parent) =>
       parent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       parent.schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||

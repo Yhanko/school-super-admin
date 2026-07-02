@@ -22,21 +22,19 @@ export function Login() {
 
   const onSubmit = async (data: AuthSchema) => {
     try {
-        
-        navigate('/dashboard');
         setLoading(true);
         const response = await api.post("/auth/login", {
-          fullName: data.fullName!,
           email: data.email,
           password: data.password,
         });
 
-        if(response.status === 200){
-          setLoading(false);
-          reset()
+        if(response.status === 200 || response.status === 201){
           const dataResponse = response.data;
+          localStorage.setItem('token', dataResponse.access_token);
+          // O backend agora devolve access_token, precisamos decodificar ou salvar para a authStore
+          useUserStore.getState().setUser({ email: data.email, role: 'SUPER_ADMIN' } as any);
+          reset();
           navigate('/dashboard');
-          useUserStore.getState().setUser(dataResponse.user);
         }
 
    } catch (err: unknown) {
@@ -95,7 +93,6 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            onClick={() =>  navigate('/dashboard')}
             className="w-full bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (

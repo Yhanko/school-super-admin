@@ -30,7 +30,7 @@ import {
   Briefcase,
   UserCircle,
   LogIn
-} from "lucide-react";
+} , Map, Ticket, FileText } from "lucide-react";
 
 export {
   Plus,

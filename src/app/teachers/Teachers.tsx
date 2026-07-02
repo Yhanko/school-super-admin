@@ -1,16 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search } from "../../lib/icons";
 import { Teacher } from "../../types/teacher";
-import { mockTeachers } from "../../data/data";
 import { TeacherTable } from "../../components/TeacherTable";
 import { TeacherModal } from "../../components/TeacherModal";
-
+import api from "../../services/api/axios";
 
 export function Teachers() {
- const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredTeachers = mockTeachers.filter(
+  useEffect(() => {
+    loadTeachers();
+  }, []);
+
+  const loadTeachers = async () => {
+    try {
+      const response = await api.get('/super-admin/users?role=TEACHER');
+      const formatted = response.data.map((user: any) => ({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        schoolId: user.institutionId || '',
+        schoolName: user.institution?.name || 'N/A',
+        totalParents: 0,
+        totalStudents: 0,
+        enrollmentDate: new Date(user.createdAt),
+        isActive: true,
+        actions: []
+      }));
+      setTeachers(formatted);
+    } catch (error) {
+      console.error('Failed to load teachers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredTeachers = teachers.filter(
     (teacher) =>
       teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       teacher.schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useLocation, useNavigate, Outlet } from "react-router-dom";
-import {
+import { Map, Ticket, FileText,  useState } from "react";
+import { Map, Ticket, FileText,  useLocation, useNavigate, Outlet } from "react-router-dom";
+import { Map, Ticket, FileText, 
   LayoutDashboard,
   School,
   DollarSign,
@@ -26,6 +26,9 @@ export function Layout() {
     { name: "Teachers", icon: SquareUser, path: "/teachers" },
     { name: "Payments", icon: DollarSign, path: "/payments" },
     { name: "Platforms", icon: Activity, path: "/platforms" },
+    { name: "Planos e Preços", icon: Map, path: "/plans" },
+    { name: "Suporte (Tickets)", icon: Ticket, path: "/tickets" },
+    { name: "Auditoria (Logs)", icon: FileText, path: "/logs" },
   ];
 
   return (

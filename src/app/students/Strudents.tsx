@@ -1,15 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search } from "../../lib/icons";
 import { Student } from "../../types/student";
-import { mockStudents } from "../../data/studentData";
 import { StudentTable } from "../../components/StudentTable";
 import { StudentModal } from "../../components/StudentModal";
+import api from "../../services/api/axios";
 
 export function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredStudents = mockStudents.filter(
+  useEffect(() => {
+    loadStudents();
+  }, []);
+
+  const loadStudents = async () => {
+    try {
+      const response = await api.get('/super-admin/users?role=STUDENT');
+      const formatted = response.data.map((user: any) => ({
+        id: user.id,
+        name: user.name,
+        schoolId: user.institutionId || '',
+        schoolName: user.institution?.name || 'N/A',
+        class: 'N/A', // from relations if existed
+        parentName: 'N/A', // from relations
+        enrollmentDate: new Date(user.createdAt),
+        isActive: true,
+        lastLogin: undefined,
+        attendanceRate: 0,
+        averageGrade: 0,
+        actions: []
+      }));
+      setStudents(formatted);
+    } catch (error) {
+      console.error('Failed to load students:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredStudents = students.filter(
     (student) =>
       student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
