@@ -48,7 +48,7 @@ export function PaymentsManager() {
         school_name: p.student?.institution?.name || 'N/A',
         student_name: p.student?.name || 'N/A',
         amount: p.amount,
-        currency: 'BRL',
+        currency: 'AOA',
         payment_type: 'tuition',
         payment_method: p.paymentMethod || 'credit_card',
         status: p.status,
@@ -216,7 +216,7 @@ export function PaymentsManager() {
                     {payment.student_name || 'N/A'}
                   </td>
                   <td className="py-3 px-4 text-sm font-semibold text-slate-900">
-                    {payment.currency} {Number(payment.amount).toFixed(2)}
+                    {Number(payment.amount).toLocaleString('pt-AO')} Kz
                   </td>
                   <td className="py-3 px-4 text-sm text-slate-600 capitalize">
                     {payment.payment_type}

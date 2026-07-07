@@ -167,10 +167,10 @@ export function PlatformsManager() {
               className="border border-slate-200 rounded-xl p-6 hover:shadow-md transition"
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={p-3 rounded-lg \}>
+                <div className="p-3 rounded-lg">
                   {getPlatformIcon(platform.platform_type)}
                 </div>
-                <span className={px-3 py-1 rounded-full text-xs font-medium border \}>
+                <span className="px-3 py-1 rounded-full text-xs font-medium border">
                   {platform.status}
                 </span>
               </div>

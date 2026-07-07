@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { LogIn } from '../../lib/icons';
+import { LogIn, Eye, EyeOff } from '../../lib/icons';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authSchema, AuthSchema } from "../../services/schema/auth";
 import { useNavigate } from 'react-router-dom';
 import api, { AxiosError } from '../../services/api/axios';
-import { useUserStore } from "../../contexts/AuthContext";
+import { useAuthStore } from "../../store/authStore";
 
 
 export function Login() {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -30,9 +31,8 @@ export function Login() {
 
         if(response.status === 200 || response.status === 201){
           const dataResponse = response.data;
-          localStorage.setItem('token', dataResponse.access_token);
-          // O backend agora devolve access_token, precisamos decodificar ou salvar para a authStore
-          useUserStore.getState().setUser({ email: data.email, role: 'SUPER_ADMIN' } as any);
+          
+          useAuthStore.getState().setAuth({ email: data.email, name: data.fullName || 'Admin', role: 'SUPER_ADMIN', id: '1' }, dataResponse.access_token);
           reset();
           navigate('/dashboard');
         }
@@ -83,12 +83,21 @@ export function Login() {
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Password
             </label>
-            <input
-              type="password"
-              {...register('password')}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
-              required
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                {...register('password')}
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
+                required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
@@ -96,23 +105,23 @@ export function Login() {
             className="w-full bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
-              'Loading...'
+              <span>Loading...</span>
               ) : (
                 <>
                   <LogIn className="w-5 h-5" />
-                  Sign In
+                  <span>Sign In</span>
                 </>
               )}
           </button>
         </form>
         <div className="mt-6 text-center">
           <button
-            onClick={() => {;
-            }}
-              className="text-slate-600 hover:text-slate-900 text-sm transition"
-            >
-              "Don't have an account? Sign Up"
-            </button>
+            type="button"
+            onClick={() => navigate('/register')}
+            className="text-slate-600 hover:text-slate-900 text-sm transition"
+          >
+            <span>Don't have an account? Sign Up</span>
+          </button>
         </div>
   </div>
 </div>

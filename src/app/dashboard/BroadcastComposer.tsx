@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import api from '../../services/api/axios';
 import { Send } from '../../lib/icons';
 
@@ -13,10 +14,10 @@ export function BroadcastComposer() {
     try {
       await api.post('/super-admin/broadcasts', { message, type });
       setMessage('');
-      alert('Aviso Global Enviado!');
+      toast.success('Aviso Global Enviado!');
     } catch (error) {
       console.error('Failed to send broadcast', error);
-      alert('Erro ao enviar aviso global.');
+      toast.error('Erro ao enviar aviso global.');
     } finally {
       setLoading(false);
     }
@@ -32,14 +33,14 @@ export function BroadcastComposer() {
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
           <select value={type} onChange={e => setType(e.target.value)} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
-            <option value="info">Informação</option>
+            <option value="info">Informaï¿½ï¿½o</option>
             <option value="warning">Aviso</option>
-            <option value="error">Crítico</option>
+            <option value="error">Crï¿½tico</option>
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Mensagem</label>
-          <textarea value={message} onChange={e => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none" placeholder="Escreva o aviso que todas as escolas verão..."></textarea>
+          <textarea value={message} onChange={e => setMessage(e.target.value)} rows={3} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none" placeholder="Escreva o aviso que todas as escolas verï¿½o..."></textarea>
         </div>
         <button onClick={handleSend} disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50">
           {loading ? 'A enviar...' : 'Transmitir Aviso'}

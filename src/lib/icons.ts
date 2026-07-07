@@ -12,6 +12,7 @@ import {
   SquareUser,
   Search,
   Eye,
+  EyeOff,
   Building2,
   Ban,
   Trash2,
@@ -29,8 +30,7 @@ import {
   Zap,
   Briefcase,
   UserCircle,
-  LogIn
-} , Map, Ticket, FileText } from "lucide-react";
+  LogIn, Map, Ticket, FileText, Send, AlertTriangle, Database, Server } from "lucide-react";
 
 export {
   Plus,
@@ -40,6 +40,10 @@ export {
   DollarSign,
   Activity,
   LogOut,
+  Send,
+  AlertTriangle,
+  Database,
+  Server,
   Menu,
   X,
   Lock,
@@ -47,12 +51,16 @@ export {
   User,
   SquareUser,
   Eye,
+  EyeOff,
   Building2,
   Ban,
   Trash2,
   GraduationCap,
   Filter, 
   TrendingUp,
+  Map, 
+  Ticket, 
+  FileText,
   Clock,
   CheckCircle,
   XCircle,

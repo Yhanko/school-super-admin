@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
-import { Building2, Search, Eye, Ban, Trash2, GraduationCap, Lock, Clock, User, X } from "../../lib/icons";
+import toast from 'react-hot-toast';
+import { Building2, Search, Eye, EyeOff, Ban, Trash2, GraduationCap, Lock, Clock, User, X } from "../../lib/icons";
 
 type School = {
   id: string;
@@ -117,17 +118,30 @@ const SchoolDetailsModal = ({ school, onClose }: SchoolDetailsModalProps) => {
         </div>
     );
 
-    const SecurityTab = () => (
+    const SecurityTab = () => {
+        const [showPassword, setShowPassword] = useState(false);
+        const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+        return (
         <div className="space-y-6">
             <h4 className="text-lg font-semibold text-slate-800">Alteração de Senha (Diretor/Admin)</h4>
             <form className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Nova Senha</label>
-                    <input type="password" placeholder="Insira a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                    <div className="relative">
+                        <input type={showPassword ? "text" : "password"} placeholder="Insira a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Confirmar Nova Senha</label>
-                    <input type="password" placeholder="Confirme a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                    <div className="relative">
+                        <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirme a nova senha" className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none" />
+                        <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-800 transition">
                     Alterar Senha
@@ -142,7 +156,8 @@ const SchoolDetailsModal = ({ school, onClose }: SchoolDetailsModalProps) => {
                 <span className="font-medium">Status de Bloqueio:</span> {school.status === 'blocked' ? 'Bloqueada' : 'Ativa'}
             </p>
         </div>
-    );
+        );
+    };
 
     const LogsTab = () => (
         <div className="space-y-4">
@@ -235,20 +250,22 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
 
   const loadSchools = async () => {
     try {
-      const response = await api.get('/super-admin/institutions');
+      const response = await api.get('/super-admin/schools');
       const formatted = response.data.map((inst: any) => ({
         id: inst.id,
         name: inst.name,
-        code: inst.id.substring(0, 6).toUpperCase(),
+        code: inst.code,
         email: inst.email,
+        phone: inst.phone,
         address: inst.address,
         status: inst.status,
-        studentsCount: inst.max_students,
-        teachersCount: inst.max_teachers,
-        staffCount: inst.max_staff,
+        director: inst.director,
+        studentsCount: inst.studentsCount,
+        teachersCount: inst.teachersCount,
+        staffCount: inst.staffCount,
         subscription_plan: inst.subscription_plan,
         subscription_expires_at: inst.subscription_expires_at,
-        monthlyRevenue: 0,
+        monthlyRevenue: inst.monthlyRevenue,
         login_history: [],
         created_at: inst.createdAt,
       }));
@@ -288,14 +305,14 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
           ? { ...s, status: s.status === "blocked" ? "active" : "blocked" }
           : s
       ));
-      alert(
+      toast.success(
         selectedSchool.status === "blocked"
           ? `Escola ${selectedSchool.name} desbloqueada com sucesso!`
           : `Escola ${selectedSchool.name} bloqueada com sucesso!`
       );
     } else if (actionType === "delete") {
       setSchools(schools.filter(s => s.id !== selectedSchool.id));
-      alert(`Escola ${selectedSchool.name} removida com sucesso!`);
+      toast.success(`Escola ${selectedSchool.name} removida com sucesso!`);
     }
 
     setSelectedSchool(null);
@@ -378,6 +395,7 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                     <th className="text-center p-4 font-semibold text-slate-700">Alunos</th>
                     <th className="text-center p-4 font-semibold text-slate-700">Professores</th>
                     <th className="text-center p-4 font-semibold text-slate-700">Funcionários</th>
+                    <th className="text-left p-4 font-semibold text-slate-700">Plano</th>
                     <th className="text-center p-4 font-semibold text-slate-700">Receita Mensal</th>
                     <th className="text-center p-4 font-semibold text-slate-700">Ações</th>
                   </tr>
@@ -439,10 +457,15 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                             <span className="font-semibold text-slate-900">{school.staffCount}</span>
                           </div>
                         </td>
+                        <td className="p-4">
+                          <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-1 rounded capitalize">
+                            {school.subscription_plan}
+                          </span>
+                        </td>
                         <td className="p-4 text-center">
                           <div className="flex flex-col items-center">
                             <span className="font-semibold text-slate-900">
-                              R$ {(school.monthlyRevenue / 1000).toFixed(0)}k
+                              {(school.monthlyRevenue || 0).toLocaleString('pt-AO')} Kz
                             </span>
                           </div>
                         </td>

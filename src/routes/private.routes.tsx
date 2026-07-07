@@ -5,6 +5,8 @@ import { SchoolsManager } from "../app/schools/SchoolsManager";
 import { Students } from "../app/students/Strudents";
 import { Teachers } from "../app/teachers/Teachers";
 import { PlatformsManager } from "../app/manage-plataform/PlatformsManager";
+import PlansPage from "../app/plans/page";
+import LogsPage from "../app/logs/page";
 
 export const privateRoutes = [
     { path: "/dashboard", element: (
@@ -32,5 +34,13 @@ export const privateRoutes = [
 
     { path: "/platforms", element: (
         <PlatformsManager />
+    ) },
+
+    { path: "/plans", element: (
+        <PlansPage />
+    ) },
+
+    { path: "/logs", element: (
+        <LogsPage />
     ) },
 ];

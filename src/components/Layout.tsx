@@ -1,5 +1,5 @@
-import { Map, Ticket, FileText,  useState } from "react";
-import { Map, Ticket, FileText,  useLocation, useNavigate, Outlet } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { Map, Ticket, FileText, 
   LayoutDashboard,
   School,
@@ -13,9 +13,11 @@ import { Map, Ticket, FileText,
   SquareUser 
 } from "../lib/icons";
 
+import { useAuthStore } from '../store/authStore';
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
   const location = useLocation();
 
   const navigation = [
@@ -26,8 +28,7 @@ export function Layout() {
     { name: "Teachers", icon: SquareUser, path: "/teachers" },
     { name: "Payments", icon: DollarSign, path: "/payments" },
     { name: "Platforms", icon: Activity, path: "/platforms" },
-    { name: "Planos e Preços", icon: Map, path: "/plans" },
-    { name: "Suporte (Tickets)", icon: Ticket, path: "/tickets" },
+    { name: "Planos e PreÃ§os", icon: Map, path: "/plans" },
     { name: "Auditoria (Logs)", icon: FileText, path: "/logs" },
   ];
 
@@ -85,8 +86,7 @@ export function Layout() {
           <div className="p-4 border-t border-slate-800">
             <button
               onClick={() => {
-                // Logout Zustand
-                navigate("/");
+                logout(); navigate("/");
               }}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
             >
@@ -113,3 +113,4 @@ export function Layout() {
     </div>
   );
 }
+

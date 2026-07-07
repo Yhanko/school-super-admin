@@ -1,8 +1,13 @@
 import { Routers } from "./routes/routes";
 
+import { Toaster } from "react-hot-toast";
+
 function App() {
   return (
-    <Routers />
+    <>
+      <Toaster position="top-right" />
+      <Routers />
+    </>
   );
 }
 
