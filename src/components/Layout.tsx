@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
-import { Map, Ticket, FileText, 
+import { Map, FileText, 
   LayoutDashboard,
   School,
   DollarSign,
