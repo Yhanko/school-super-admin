@@ -137,6 +137,7 @@ export function SchoolsManager() {
       await api.post('/super-admin/schools', {
         schoolName: formData.name,
         schoolEmail: formData.email,
+        schoolPhone: formData.phone,
         schoolAddress: formData.address,
         adminName: formData.director,
         adminEmail: formData.email,

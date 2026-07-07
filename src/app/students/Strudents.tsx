@@ -7,6 +7,7 @@ import api from "../../services/api/axios";
 
 export function Students() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,13 +41,22 @@ export function Students() {
     }
   };
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.schoolName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.class.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.parentName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+    student.schoolName.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+    student.class.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+    student.parentName.toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
+
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 pl-6 pr-6 animate-fade-in">
@@ -57,17 +67,25 @@ export function Students() {
           </h1>
         </header>
 
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input
-              type="search"
-              placeholder="Buscar estudantes por nome, escola..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-            />
+        {/* Search */}
+        <div className="mb-6 space-y-4">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Buscar alunos por nome, escola ou encarregado..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+              />
+            </div>
+            <button onClick={handleSearch} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              Buscar
+            </button>
           </div>
+
           <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
             <label htmlFor="school-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Filtrar Alunos por Escola:</label>
               <select 

@@ -240,6 +240,7 @@ import { useEffect } from 'react';
 export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
   const [schools, setSchools] = useState<School[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [actionType, setActionType] = useState<"block" | "delete" | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -276,10 +277,20 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
   };
 
   const filteredSchools = schools.filter(school =>
-    school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    school.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (school.director || "").toLowerCase().includes(searchTerm.toLowerCase())
+    school.name.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+    school.code.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+    (school.director || "").toLowerCase().includes(activeSearchTerm.toLowerCase())
   );
+
+  const handleSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleBlockSchool = (school: School) => {
     setSelectedSchool(school);
@@ -365,16 +376,22 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
           </div>
         </div>
         <div className="mb-6">
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input
-                    type="text"
-                    placeholder="Buscar escolas por nome ou código..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                />
-            </div>
+                  <div className="relative flex gap-2">
+                    <div className="relative flex-1">
+                        <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                        type="text"
+                        placeholder="Buscar por nome, código ou diretor..."
+                        className="w-full pl-10 pr-4 py-2 border-[1px] border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        />
+                    </div>
+                    <button onClick={handleSearch} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        Buscar
+                    </button>
+                  </div>
         </div>
 
         {/* Schools List */}
