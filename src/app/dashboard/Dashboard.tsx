@@ -70,11 +70,19 @@ export function Dashboard() {
         const response = await api.get('/super-admin/dashboard');
         setStats(prev => ({
           ...prev,
-          totalSchools: response.data.totalSchools,
-          activeSchools: response.data.activeSubscriptions,
-          totalStudents: response.data.totalStudents,
-          totalTeachers: response.data.totalTeachers,
-          totalRevenue: response.data.monthlyRevenue,
+          totalSchools: response.data.totalSchools || 0,
+          activeSchools: response.data.activeSubscriptions || 0,
+          blockedSchools: response.data.blockedSchools || 0,
+          totalStudents: response.data.totalStudents || 0,
+          totalTeachers: response.data.totalTeachers || 0,
+          totalStaff: response.data.totalStaff || 0,
+          totalParents: response.data.totalParents || 0,
+          activeParents: response.data.activeParents || 0,
+          totalPayments: response.data.totalPayments || 0,
+          completedPayments: response.data.completedPayments || 0,
+          totalRevenue: response.data.monthlyRevenue || 0,
+          pendingRevenue: response.data.pendingRevenue || 0,
+          activePlatforms: response.data.activePlatforms || 0,
         }));
       } catch (error) {
         console.error('Failed to load dashboard metrics', error);
