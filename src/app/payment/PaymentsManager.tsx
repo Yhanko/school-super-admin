@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from '../../lib/icons';
+import api from '../../services/api/axios';
 
 interface Payment {
   id: string;
@@ -21,172 +22,10 @@ interface PaymentWithDetails extends Payment {
   student_name?: string;
 }
 
-const MOCK_PAYMENTS: PaymentWithDetails[] = [
-  {
-    id: '1',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    parent_name: 'John Smith',
-    student_name: 'Emma Smith',
-    amount: 1500,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'credit_card',
-    status: 'completed',
-    description: 'Monthly tuition payment',
-    transaction_id: 'TXN-2024-001',
-    paid_at: '2024-12-01T10:30:00Z',
-    created_at: '2024-12-01T10:30:00Z'
-  },
-  {
-    id: '2',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    parent_name: 'Sarah Johnson',
-    student_name: 'Michael Johnson',
-    amount: 800,
-    currency: 'USD',
-    payment_type: 'activities',
-    payment_method: 'bank_transfer',
-    status: 'completed',
-    description: 'Sports activities fee',
-    transaction_id: 'TXN-2024-002',
-    paid_at: '2024-11-30T14:15:00Z',
-    created_at: '2024-11-30T14:15:00Z'
-  },
-  {
-    id: '3',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    parent_name: 'Robert Davis',
-    student_name: 'Jessica Davis',
-    amount: 1500,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'credit_card',
-    status: 'pending',
-    description: 'Monthly tuition payment',
-    transaction_id: 'TXN-2024-003',
-    paid_at: null,
-    created_at: '2024-12-03T09:00:00Z'
-  },
-  {
-    id: '4',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    parent_name: 'Maria Garcia',
-    student_name: 'Lucas Garcia',
-    amount: 2000,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'paypal',
-    status: 'completed',
-    description: 'Quarterly tuition',
-    transaction_id: 'TXN-2024-004',
-    paid_at: '2024-11-28T11:45:00Z',
-    created_at: '2024-11-28T11:45:00Z'
-  },
-  {
-    id: '5',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    parent_name: 'James Wilson',
-    student_name: 'Sophia Wilson',
-    amount: 500,
-    currency: 'USD',
-    payment_type: 'exam_fees',
-    payment_method: 'credit_card',
-    status: 'failed',
-    description: 'Standardized exam fee',
-    transaction_id: 'TXN-2024-005',
-    paid_at: null,
-    created_at: '2024-12-02T16:20:00Z'
-  },
-  {
-    id: '6',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    parent_name: 'Patricia Anderson',
-    student_name: 'David Anderson',
-    amount: 1200,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'bank_transfer',
-    status: 'completed',
-    description: 'Monthly tuition payment',
-    transaction_id: 'TXN-2024-006',
-    paid_at: '2024-11-25T08:30:00Z',
-    created_at: '2024-11-25T08:30:00Z'
-  },
-  {
-    id: '7',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    parent_name: 'Christopher Martinez',
-    student_name: 'Isabella Martinez',
-    amount: 300,
-    currency: 'USD',
-    payment_type: 'supplies',
-    payment_method: 'credit_card',
-    status: 'pending',
-    description: 'School supplies package',
-    transaction_id: 'TXN-2024-007',
-    paid_at: null,
-    created_at: '2024-12-03T13:50:00Z'
-  },
-  {
-    id: '8',
-    school_id: 'sch_002',
-    school_name: 'Washington Academy',
-    parent_name: 'Jennifer Brown',
-    student_name: 'William Brown',
-    amount: 1500,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'paypal',
-    status: 'completed',
-    description: 'Monthly tuition payment',
-    transaction_id: 'TXN-2024-008',
-    paid_at: '2024-11-22T15:10:00Z',
-    created_at: '2024-11-22T15:10:00Z'
-  },
-  {
-    id: '9',
-    school_id: 'sch_001',
-    school_name: 'Lincoln High School',
-    parent_name: 'Linda Taylor',
-    student_name: 'Olivia Taylor',
-    amount: 650,
-    currency: 'USD',
-    payment_type: 'lab_fees',
-    payment_method: 'credit_card',
-    status: 'completed',
-    description: 'Science lab equipment fee',
-    transaction_id: 'TXN-2024-009',
-    paid_at: '2024-11-20T12:25:00Z',
-    created_at: '2024-11-20T12:25:00Z'
-  },
-  {
-    id: '10',
-    school_id: 'sch_003',
-    school_name: 'Central Elementary',
-    parent_name: 'Daniel Thomas',
-    student_name: 'James Thomas',
-    amount: 1800,
-    currency: 'USD',
-    payment_type: 'tuition',
-    payment_method: 'bank_transfer',
-    status: 'completed',
-    description: 'Semester tuition',
-    transaction_id: 'TXN-2024-010',
-    paid_at: '2024-11-18T09:45:00Z',
-    created_at: '2024-11-18T09:45:00Z'
-  }
-];
-
 export function PaymentsManager() {
   const [payments, setPayments] = useState<PaymentWithDetails[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeSearchTerm, setActiveSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [stats, setStats] = useState({
     total: 0,
@@ -198,11 +37,35 @@ export function PaymentsManager() {
   });
 
   useEffect(() => {
-    setPayments(MOCK_PAYMENTS);
-    calculateStats(MOCK_PAYMENTS);
+    loadPayments();
   }, []);
 
-  const calculateStats = (paymentsData: Payment[]) => {
+  const loadPayments = async () => {
+    try {
+      const response = await api.get('/super-admin/payments');
+      const data = response.data.map((p: any) => ({
+        id: p.id,
+        school_id: p.student?.institution?.id || '',
+        school_name: p.student?.institution?.name || 'N/A',
+        student_name: p.student?.name || 'N/A',
+        amount: p.amount,
+        currency: 'AOA',
+        payment_type: 'tuition',
+        payment_method: p.paymentMethod || 'credit_card',
+        status: p.status,
+        description: '',
+        transaction_id: p.id,
+        paid_at: p.paymentDate,
+        created_at: p.createdAt
+      }));
+      setPayments(data);
+      calculateStats(data);
+    } catch (error) {
+      console.error('Failed to load payments:', error);
+    }
+  };
+
+  const calculateStats = (paymentsData: PaymentWithDetails[]) => {
     const completed = paymentsData.filter(p => p.status === 'completed');
     const pending = paymentsData.filter(p => p.status === 'pending');
     const failed = paymentsData.filter(p => p.status === 'failed');
@@ -221,11 +84,11 @@ export function PaymentsManager() {
   };
 
   const filteredPayments = payments.filter(payment => {
-    const matchesSearch =
-      payment.school_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.parent_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.student_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.transaction_id?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = 
+      payment.school_name?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      payment.parent_name?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      payment.student_name?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+      payment.transaction_id?.toLowerCase().includes(activeSearchTerm.toLowerCase());
 
     const matchesStatus = filterStatus === 'all' || payment.status === filterStatus;
 
@@ -258,7 +121,7 @@ export function PaymentsManager() {
             <DollarSign className="w-5 h-5 text-emerald-500" />
             <h3 className="text-sm font-medium text-slate-600">Total Revenue</h3>
           </div>
-          <p className="text-2xl font-bold text-slate-900">${stats.totalRevenue.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-slate-900">\</p>
           <p className="text-xs text-slate-500 mt-1">{stats.completed} completed</p>
         </div>
 
@@ -267,7 +130,7 @@ export function PaymentsManager() {
             <TrendingUp className="w-5 h-5 text-amber-500" />
             <h3 className="text-sm font-medium text-slate-600">Pending</h3>
           </div>
-          <p className="text-2xl font-bold text-slate-900">${stats.pendingRevenue.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-slate-900">\</p>
           <p className="text-xs text-slate-500 mt-1">{stats.pending} pending</p>
         </div>
 
@@ -294,16 +157,20 @@ export function PaymentsManager() {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by school, parent, student, or transaction ID..."
+              placeholder="Buscar por escola, encarregado, aluno ou ID..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-600 outline-none"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+              onKeyDown={(e) => e.key === 'Enter' && setActiveSearchTerm(searchTerm)}
             />
           </div>
+          <button onClick={() => setActiveSearchTerm(searchTerm)} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            Buscar
+          </button>
 
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-slate-400" />
@@ -354,7 +221,7 @@ export function PaymentsManager() {
                     {payment.student_name || 'N/A'}
                   </td>
                   <td className="py-3 px-4 text-sm font-semibold text-slate-900">
-                    {payment.currency} {Number(payment.amount).toFixed(2)}
+                    {Number(payment.amount).toLocaleString('pt-AO')} Kz
                   </td>
                   <td className="py-3 px-4 text-sm text-slate-600 capitalize">
                     {payment.payment_type}

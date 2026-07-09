@@ -3,8 +3,12 @@ import {
   School,
   Plus,
   X,
+  Eye,
+  EyeOff
 } from '../../lib/icons';
+import toast from 'react-hot-toast';
 import { SchoolsList } from "./Shools"
+import api from '../../services/api/axios';
 
 // Dados fictícios para simular a resposta do Supabase
 const mockSchools: School[] = [
@@ -82,149 +86,92 @@ interface SchoolStats {
 }
 
 export function SchoolsManager() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [editingSchool, setEditingSchool] = useState<School | null>(null);
-  const [, setSchools] = useState<School[]>([]); // Novo estado para a lista de escolas
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [plans, setPlans] = useState<any[]>([]);
+
+  useEffect(() => {
+    api.get('/super-admin/plans').then(res => setPlans(res.data)).catch(console.error);
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
-    code: '',
+    director: '',
     email: '',
     phone: '',
     address: '',
-    max_students: 1000,
-    max_teachers: 100,
-    max_staff: 50,
-    subscription_plan: 'basic'
+    planId: '',
+    password: '',
+    confirmPassword: '',
   });
 
-  useEffect(() => {
-    loadSchools();
-  }, []);
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      director: '',
+      email: '',
+      phone: '',
+      address: '',
+      planId: '',
+      password: '',
+      confirmPassword: '',
+    });
+    setShowModal(false);
+  };
 
-  // Função fictícia para simular o carregamento de escolas
-  const loadSchools = async () => {
-    console.log('Simulando carregamento de escolas...');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('As senhas não coincidem!');
+      return;
+    }
+
     setLoading(true);
-    // Simula um atraso de rede
-    await new Promise(resolve => setTimeout(resolve, 500));
 
     try {
-      // Retorna os dados do "banco de dados" em memória
-      const data = schoolsData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      await api.post('/super-admin/schools', {
+        schoolName: formData.name,
+        schoolEmail: formData.email,
+        schoolPhone: formData.phone,
+        schoolAddress: formData.address,
+        adminName: formData.director,
+        adminEmail: formData.email,
+        adminPassword: formData.password,
+        planId: formData.planId
+      });
 
-      if (data) {
-        console.log('Escolas carregadas (fictícias):', data);
-        setSchools(data); // Atualiza o estado com os dados fictícios
-        await loadSchoolStats(data.map(s => s.id));
-      }
+      resetForm();
+      setRefreshTrigger(prev => prev + 1);
+      toast.success('Escola criada com sucesso!');
     } catch (error) {
-      console.error('Erro simulado ao carregar escolas:', error);
+      console.error('Failed to create school:', error);
+      toast.error('Erro ao criar escola');
     } finally {
       setLoading(false);
     }
   };
 
-  // Função fictícia para simular o carregamento de estatísticas
-  const loadSchoolStats = async (schoolIds: string[]) => {
-    console.log('Simulando carregamento de estatísticas para IDs:', schoolIds);
-    // Simula um atraso de rede
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const stats: Record<string, SchoolStats> = {};
-
-    for (const schoolId of schoolIds) {
-      // Dados fictícios de estatísticas
-      const mockStats: SchoolStats = {
-        students: Math.floor(Math.random() * 1000) + 100,
-        teachers: Math.floor(Math.random() * 50) + 10,
-        staff: Math.floor(Math.random() * 20) + 5,
-        parents: Math.floor(Math.random() * 1500) + 200,
-      };
-      stats[schoolId] = mockStats;
-    }
-
-    console.log('Estatísticas carregadas (fictícias):', stats);
-    // Nota: O componente original apenas logava as estatísticas.
-    // Se a SchoolsList precisar delas, será necessário um novo estado e passar via props.
-  };
-
-  // Função fictícia para simular o envio do formulário (CRUD)
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    console.log('Simulando salvamento de escola com dados:', formData);
-    // Simula um atraso de rede
-    await new Promise(resolve => setTimeout(resolve, 700));
-
-    try {
-      if (editingSchool) {
-        // Simula a atualização
-        schoolsData = schoolsData.map(s =>
-          s.id === editingSchool.id
-            ? { ...s, ...formData, updated_at: new Date().toISOString() }
-            : s
-        );
-        console.log('Escola atualizada (fictícia).');
-      } else {
-        // Simula a inserção
-        const newSchool: School = {
-          ...formData,
-          id: `sch-${Date.now()}`, // ID fictício
-          status: 'active',
-          subscription_expires_at: '2026-12-31T00:00:00Z',
-          created_at: new Date().toISOString(),
-        };
-        schoolsData.push(newSchool);
-        console.log('Escola criada (fictícia):', newSchool);
-      }
-
-      resetForm();
-      loadSchools(); // Recarrega a lista fictícia
-    } catch (error) {
-      console.error('Erro simulado ao salvar escola:', error);
-      alert('Erro simulado ao salvar escola. Tente novamente.');
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      code: '',
-      email: '',
-      phone: '',
-      address: '',
-      max_students: 1000,
-      max_teachers: 100,
-      max_staff: 50,
-      subscription_plan: 'basic'
-    });
-    setEditingSchool(null);
-    setShowModal(false);
-  };
-
-  if (loading) {
-    return <div className="text-center py-8 text-slate-600">Loading schools...</div>;
-  }
-
   return (
     <div>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Gerenciamento de Escolas</h2>
-          <p className="text-slate-600 mt-1">Cadastrar, gerenciar e monitorar escolas da rede</p>
+          <h2 className="text-3xl font-bold text-slate-900">Schools Directory</h2>
+          <p className="text-slate-500 mt-2">Manage registered institutions</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-slate-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-800 transition flex items-center gap-2"
+          className="bg-slate-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-slate-800 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
           Add School
         </button>
       </div>
-      {/* Passando a lista de escolas fictícias para o componente SchoolsList */}
-      <SchoolsList />
+      <SchoolsList refreshTrigger={refreshTrigger} />
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -242,7 +189,7 @@ export function SchoolsManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    School Name *
+                    Nome da Escola *
                   </label>
                   <input
                     type="text"
@@ -252,35 +199,34 @@ export function SchoolsManager() {
                     required
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    School Code *
+                    Nome do Diretor *
                   </label>
                   <input
                     type="text"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    value={formData.director}
+                    onChange={(e) => setFormData({ ...formData, director: e.target.value })}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
                     required
-                    disabled={!!editingSchool}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Email *</label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Telefone</label>
                   <input
                     type="tel"
                     value={formData.phone}
@@ -290,87 +236,76 @@ export function SchoolsManager() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Address</label>
-                <input
-                type='text'
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Endereço</label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Plano de Assinatura *</label>
+                  <select
+                    value={formData.planId}
+                    onChange={(e) => setFormData({ ...formData, planId: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                    required
+                  >
+                    <option value="">Selecione um plano</option>
+                    {plans.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Max Students
+                    Senha (Admin) *
                   </label>
-                  <input
-                    type="number"
-                    value={formData.max_students}
-                    onChange={(e) => setFormData({ ...formData, max_students: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    min="1"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Max Teachers
+                    Confirmar Senha *
                   </label>
-                  <input
-                    type="number"
-                    value={formData.max_teachers}
-                    onChange={(e) => setFormData({ ...formData, max_teachers: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    min="1"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Max Staff
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.max_staff}
-                    onChange={(e) => setFormData({ ...formData, max_staff: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    min="1"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Subscription Plan
-                </label>
-                <select
-                  value={formData.subscription_plan}
-                  onChange={(e) => setFormData({ ...formData, subscription_plan: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                >
-                  <option value="basic">Basic</option>
-                  <option value="standard">Standard</option>
-                  <option value="premium">Premium</option>
-                  <option value="enterprise">Enterprise</option>
-                </select>
-              </div>
-
-              <div className='space-y-4'>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Senha
-                </label>
-                <input
-                  type="password"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                  placeholder='Insira a senha'
-                />
-                <input
-                  type="password"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                  placeholder='Confirme a senha'
-                />
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -379,13 +314,14 @@ export function SchoolsManager() {
                   onClick={resetForm}
                   className="flex-1 bg-slate-100 text-slate-900 py-3 rounded-lg font-medium hover:bg-slate-200 transition"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition"
+                  disabled={loading}
+                  className="flex-1 bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50"
                 >
-                  {editingSchool ? 'Update School' : 'Create School'}
+                  {loading ? 'Aguarde...' : editingSchool ? 'Atualizar Escola' : 'Criar Escola'}
                 </button>
               </div>
             </form>
