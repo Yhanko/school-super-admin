@@ -18,14 +18,19 @@ export function Parents() {
 
   const loadParents = async () => {
     try {
-      const response = await api.get('/super-admin/users?role=PARENT');
+      const response = await api.get('/super-admin/parents');
       const formatted = response.data.map((user: any) => ({
         id: user.id,
         name: user.name,
         schoolId: user.institutionId || '',
         schoolName: user.institution?.name || 'N/A',
         class: 'N/A', // from relations if existed
+        grade: 'N/A',
         parentName: user.name,
+        teachers: [],
+        paidPayments: 0,
+        totalPayments: 0,
+        overduePayments: 0,
         enrollmentDate: new Date(user.createdAt),
         isActive: true,
         lastLogin: undefined,

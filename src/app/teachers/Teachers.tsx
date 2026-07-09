@@ -18,7 +18,7 @@ export function Teachers() {
 
   const loadTeachers = async () => {
     try {
-      const response = await api.get('/super-admin/users?role=TEACHER');
+      const response = await api.get('/super-admin/teachers');
       const formatted = response.data.map((user: any) => ({
         id: user.id,
         name: user.name,

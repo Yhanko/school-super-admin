@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { RecentSchools } from "./RecentSchools";
 import { HealthReport } from "./HealthReport";
 import { BroadcastComposer } from "./BroadcastComposer";
 import {
@@ -183,7 +182,6 @@ export function Dashboard() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2">
-          <RecentSchools />
           <HealthReport />
         </div>
         <div className="lg:col-span-1">
