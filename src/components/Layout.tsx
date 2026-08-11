@@ -49,17 +49,27 @@ export function Layout() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800/60 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-slate-800">
-            <h1 className="text-2xl font-bold text-white">School Manager</h1>
-            <p className="text-slate-400 text-sm mt-1">Super Admin Platform</p>
+        <div className="flex flex-col h-full max-h-screen">
+          <div className="p-6 border-b border-slate-800 flex items-center justify-between shrink-0">
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                <span>School Manager</span>
+              </h1>
+              <p className="text-slate-400 text-sm mt-1">Super Admin Platform</p>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -70,28 +80,28 @@ export function Layout() {
                     navigate(item.path);
                     setSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-150 ${
                     isActive
-                      ? "bg-slate-800 text-white"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
                       : "text-slate-300 hover:bg-slate-800 hover:text-white"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
+                  <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-400"}`} />
+                  <span>{item.name}</span>
                 </button>
               );
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-800">
+          <div className="p-4 border-t border-slate-800 shrink-0 bg-slate-900">
             <button
               onClick={() => {
                 logout(); navigate("/");
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-150 font-medium text-sm"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">Sign Out</span>
+              <span>Sair da Conta</span>
             </button>
           </div>
         </div>
