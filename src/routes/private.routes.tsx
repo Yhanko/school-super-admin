@@ -7,10 +7,14 @@ import { Teachers } from "../app/teachers/Teachers";
 import { PlatformsManager } from "../app/manage-plataform/PlatformsManager";
 import PlansPage from "../app/plans/page";
 import LogsPage from "../app/logs/page";
+import { LeadsPage } from "../app/leads/LeadsPage";
 
 export const privateRoutes = [
     { path: "/dashboard", element: (
         <Dashboard />
+    ) },
+    { path: "/leads", element: (
+        <LeadsPage />
     ) },
     
     { path: "/payments", element: (

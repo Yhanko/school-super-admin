@@ -22,6 +22,7 @@ export function Layout() {
 
   const navigation = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+    { name: "Interessados", icon: User, path: "/leads" },
     { name: "Schools", icon: School, path: "/schools" },
     { name: "Students", icon: User, path: "/students" },
     { name: "Parents", icon: Users2, path: "/parents" },
