@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
+import api from '../../services/api/axios';
+
 export function SettingsPage() {
   const [platformName, setPlatformName] = useState('YhankoEduca');
   const [supportEmail, setSupportEmail] = useState('suporte@yhanko.com');
@@ -8,31 +10,40 @@ export function SettingsPage() {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // In a real scenario we would fetch these settings from the backend
-  // For now, simulating fetching settings
   useEffect(() => {
-    const savedSettings = localStorage.getItem('globalSettings');
-    if (savedSettings) {
-      const parsed = JSON.parse(savedSettings);
-      setPlatformName(parsed.platformName || 'YhankoEduca');
-      setSupportEmail(parsed.supportEmail || 'suporte@yhanko.com');
-      setAllowNewRegistrations(parsed.allowNewRegistrations ?? true);
-      setMaintenanceMode(parsed.maintenanceMode ?? false);
-    }
+    const fetchSettings = async () => {
+      try {
+        const response = await api.get('/settings');
+        const parsed = response.data;
+        if (parsed) {
+          setPlatformName(parsed.platformName || 'YhankoEduca');
+          setSupportEmail(parsed.supportEmail || 'suporte@yhanko.com');
+          setAllowNewRegistrations(parsed.allowNewRegistrations ?? true);
+          setMaintenanceMode(parsed.maintenanceMode ?? false);
+        }
+      } catch (error) {
+        console.error('Failed to load settings', error);
+      }
+    };
+    fetchSettings();
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
-    setTimeout(() => {
-      localStorage.setItem('globalSettings', JSON.stringify({
+    try {
+      await api.put('/settings', {
         platformName,
         supportEmail,
         allowNewRegistrations,
         maintenanceMode
-      }));
+      });
       toast.success('Configurações salvas com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao salvar as configurações.');
+      console.error(error);
+    } finally {
       setSaving(false);
-    }, 800);
+    }
   };
 
   return (
