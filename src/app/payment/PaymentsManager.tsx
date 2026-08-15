@@ -114,8 +114,8 @@ export function PaymentsManager() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Payments & Transactions</h2>
-          <p className="text-slate-600 mt-1">Track all payment activities across schools</p>
+          <h2 className="text-3xl font-bold text-slate-900">Pagamentos & Transações</h2>
+          <p className="text-slate-600 mt-1">Acompanhe todas as atividades de pagamento em todas as escolas</p>
         </div>
         <button
           onClick={() => exportToCSV(payments, 'payments')}
@@ -130,39 +130,39 @@ export function PaymentsManager() {
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <DollarSign className="w-5 h-5 text-emerald-500" />
-            <h3 className="text-sm font-medium text-slate-600">Total Revenue</h3>
+            <h3 className="text-sm font-medium text-slate-600">Total Receita</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">\</p>
-          <p className="text-xs text-slate-500 mt-1">{stats.completed} completed</p>
+          <p className="text-xs text-slate-500 mt-1">{stats.completed} concluídos</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <TrendingUp className="w-5 h-5 text-amber-500" />
-            <h3 className="text-sm font-medium text-slate-600">Pending</h3>
+            <h3 className="text-sm font-medium text-slate-600">Pendente</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">\</p>
-          <p className="text-xs text-slate-500 mt-1">{stats.pending} pending</p>
+          <p className="text-xs text-slate-500 mt-1">{stats.pending} pendentes</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <CheckCircle className="w-5 h-5 text-green-500" />
-            <h3 className="text-sm font-medium text-slate-600">Success Rate</h3>
+            <h3 className="text-sm font-medium text-slate-600">Taxa de Sucesso</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">
             {stats.total > 0 ? ((stats.completed / stats.total) * 100).toFixed(1) : 0}%
           </p>
-          <p className="text-xs text-slate-500 mt-1">of all transactions</p>
+          <p className="text-xs text-slate-500 mt-1">de todas as transações</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <XCircle className="w-5 h-5 text-red-500" />
-            <h3 className="text-sm font-medium text-slate-600">Failed</h3>
+            <h3 className="text-sm font-medium text-slate-600">Falhados</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.failed}</p>
-          <p className="text-xs text-slate-500 mt-1">failed transactions</p>
+          <p className="text-xs text-slate-500 mt-1">transações falhadas</p>
         </div>
       </div>
 
@@ -190,11 +190,11 @@ export function PaymentsManager() {
               onChange={(e) => setFilterStatus(e.target.value)}
               className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
             >
-              <option value="all">All Status</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
+              <option value="all">Todos os Status</option>
+              <option value="completed">Concluído</option>
+              <option value="pending">Pendente</option>
+              <option value="failed">Falhou</option>
+              <option value="refunded">Reembolsado</option>
             </select>
           </div>
         </div>
@@ -204,13 +204,13 @@ export function PaymentsManager() {
             <thead>
               <tr className="border-b border-slate-200">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Status</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">School</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Parent</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Student</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Amount</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Type</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Method</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Date</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Escola</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Encarregado</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Estudante</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Valor</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Tipo</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Método</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Data</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">Recibo</th>
               </tr>
             </thead>
@@ -260,7 +260,7 @@ export function PaymentsManager() {
 
           {filteredPayments.length === 0 && (
             <div className="text-center py-8 text-slate-500">
-              No payments found matching your criteria.
+              Nenhum pagamento encontrado com os critérios selecionados.
             </div>
           )}
         </div>

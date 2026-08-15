@@ -82,7 +82,7 @@ export function Teachers() {
             </button>
           </div>
           <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <label htmlFor="school-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Filtrar Alunos por Escola:</label>
+            <label htmlFor="school-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">Filtrar Professores por Escola:</label>
               <select 
                   id="school-filter" 
                   name="school-filter" 

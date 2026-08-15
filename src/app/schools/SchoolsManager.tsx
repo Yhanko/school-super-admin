@@ -143,17 +143,17 @@ export function SchoolsManager() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900">Schools Directory</h2>
-          <p className="text-slate-500 mt-2">Manage registered institutions</p>
+          <h2 className="text-3xl font-bold text-slate-900">Instituições</h2>
+          <p className="text-slate-500 mt-2">Gira todas as escolas registadas na plataforma</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Add School
+          Adicionar Escola
         </button>
       </div>
       <SchoolsList refreshTrigger={refreshTrigger} />
@@ -163,7 +163,7 @@ export function SchoolsManager() {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white">
               <h3 className="text-2xl font-bold text-slate-900">
-                {editingSchool ? 'Edit School' : 'Add New School'}
+                {editingSchool ? 'Editar Escola' : 'Adicionar Nova Escola'}
               </h3>
               <button onClick={resetForm} className="text-slate-400 hover:text-slate-600">
                 <X className="w-6 h-6" />
@@ -287,20 +287,21 @@ export function SchoolsManager() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 bg-slate-100 text-slate-900 py-3 rounded-lg font-medium hover:bg-slate-200 transition"
+                  className="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50"
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700 transition disabled:opacity-50 flex items-center gap-2"
                 >
-                  {loading ? 'Aguarde...' : editingSchool ? 'Atualizar Escola' : 'Criar Escola'}
+                  {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
+                  {editingSchool ? 'Salvar Alterações' : 'Criar Escola'}
                 </button>
               </div>
             </form>

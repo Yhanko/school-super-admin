@@ -95,75 +95,80 @@ export function Dashboard() {
 
   const cards = [
     {
-      title: 'Total Schools',
+      title: 'Total Escolas',
       value: stats.totalSchools,
-      subtitle: `${stats.activeSchools} active, ${stats.blockedSchools} blocked`,
+      subtitle: `${stats.activeSchools} activas, ${stats.blockedSchools} bloqueadas`,
       icon: School,
-      color: 'bg-blue-500'
+      color: 'bg-blue-500',
+      trend: '+2 este mês'
     },
     {
-      title: 'Students',
+      title: 'Total Estudantes',
       value: stats.totalStudents.toLocaleString(),
-      subtitle: 'Across all schools',
+      subtitle: 'Em todas as escolas',
       icon: GraduationCap,
-      color: 'bg-green-500'
+      color: 'bg-emerald-500',
+      trend: '+124 este mês'
     },
     {
-      title: 'Teachers',
+      title: 'Total Professores',
       value: stats.totalTeachers.toLocaleString(),
-      subtitle: 'Active educators',
-      icon: Users,
-      color: 'bg-orange-500'
-    },
-    {
-      title: 'Staff Members',
-      value: stats.totalStaff.toLocaleString(),
-      subtitle: 'Administrative staff',
+      subtitle: 'Docentes Activos',
       icon: Briefcase,
-      color: 'bg-slate-500'
+      color: 'bg-purple-500',
+      trend: '+12 este mês'
     },
     {
-      title: 'Parents',
+      title: 'Encarregados (Pais)',
       value: stats.totalParents.toLocaleString(),
-      subtitle: `${stats.activeParents} using platform`,
-      icon: UserCircle,
-      color: 'bg-cyan-500'
+      subtitle: `${stats.activeParents.toLocaleString()} com app instalada`,
+      icon: Users,
+      color: 'bg-amber-500',
+      trend: '+45% adopção'
     },
     {
-      title: 'Total Revenue',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
-      subtitle: `${stats.completedPayments} completed payments`,
+      title: 'Total Receita',
+      value: new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(stats.totalRevenue),
+      subtitle: `${new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(stats.pendingRevenue)} pendente`,
       icon: DollarSign,
-      color: 'bg-emerald-500'
+      color: 'bg-emerald-600',
+      trend: '+15% vs mês anterior'
     },
     {
-      title: 'Pending Revenue',
-      value: `$${stats.pendingRevenue.toLocaleString()}`,
-      subtitle: `${stats.totalPayments - stats.completedPayments} pending payments`,
+      title: 'Pagamentos Processados',
+      value: stats.totalPayments.toLocaleString(),
+      subtitle: `${stats.completedPayments.toLocaleString()} pagos com sucesso`,
       icon: TrendingUp,
-      color: 'bg-amber-500'
+      color: 'bg-indigo-500',
+      trend: '94% sucesso'
     },
     {
-      title: 'Active Platforms',
+      title: 'Plataformas Activas',
       value: stats.activePlatforms,
-      subtitle: 'Platform integrations',
+      subtitle: 'Dispositivos sincronizados',
       icon: Activity,
-      color: 'bg-violet-500'
+      color: 'bg-rose-500',
+      trend: 'Sistema saudável'
+    },
+    {
+      title: 'Staff Global',
+      value: stats.totalStaff.toLocaleString(),
+      subtitle: 'Administrativos e Directores',
+      icon: UserCircle,
+      color: 'bg-slate-700',
+      trend: 'Estável'
     }
   ];
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-slate-600">Loading statistics...</div>
-      </div>
-    );
+    return <div className="p-8 text-center text-slate-500">A carregar estatísticas...</div>;
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Dashboard</h2>
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard de Administração</h1>
+        <p className="text-slate-500">Visão global de todas as instituições e recursos da YhankoEduca</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

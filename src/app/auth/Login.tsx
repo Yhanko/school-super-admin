@@ -53,14 +53,14 @@ export function Login() {
           <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
             <img src={YhankoLogo} alt="Yhanko Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">School Manager</h1>
-          <p className="text-slate-600 mt-2">Super Admin Platform</p>
+          <h1 className="text-3xl font-bold text-slate-900">Gestão Escolar</h1>
+          <p className="text-slate-600 mt-2">Plataforma Super Admin</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Full Name
+              Nome Completo
             </label>
             <input
               type="text"
@@ -84,7 +84,7 @@ export function Login() {
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Password
+              Palavra-passe
             </label>
             <div className="relative">
               <input
@@ -106,16 +106,16 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition flex items-center justify-center gap-2 mt-8 disabled:opacity-50"
           >
             {loading ? (
-              <span>Loading...</span>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  <span>Sign In</span>
-                </>
-              )}
+              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                <LogIn className="w-5 h-5" />
+                <span>Entrar na Conta</span>
+              </>
+            )}
           </button>
         </form>
         <div className="mt-6 text-center">
@@ -124,7 +124,7 @@ export function Login() {
             onClick={() => navigate('/register')}
             className="text-slate-600 hover:text-purple-600 font-medium text-sm transition"
           >
-            <span>Don't have an account? Sign Up</span>
+            <span>Não tem uma conta? Registe-se</span>
           </button>
         </div>
   </div>

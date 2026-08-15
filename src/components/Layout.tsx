@@ -25,12 +25,12 @@ export function Layout() {
   const navigation = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Interessados", icon: User, path: "/leads" },
-    { name: "Schools", icon: School, path: "/schools" },
-    { name: "Students", icon: User, path: "/students" },
-    { name: "Parents", icon: Users2, path: "/parents" },
-    { name: "Teachers", icon: SquareUser, path: "/teachers" },
-    { name: "Payments", icon: DollarSign, path: "/payments" },
-    { name: "Platforms", icon: Activity, path: "/platforms" },
+    { name: "Escolas", icon: School, path: "/schools" },
+    { name: "Estudantes", icon: User, path: "/students" },
+    { name: "Encarregados", icon: Users2, path: "/parents" },
+    { name: "Professores", icon: SquareUser, path: "/teachers" },
+    { name: "Pagamentos", icon: DollarSign, path: "/payments" },
+    { name: "Plataformas", icon: Activity, path: "/platforms" },
     { name: "Planos e Preços", icon: Map, path: "/plans" },
     { name: "Suporte", icon: MessageSquare, path: "/tickets" },
     { name: "Auditoria (Logs)", icon: FileText, path: "/logs" },
@@ -62,9 +62,9 @@ export function Layout() {
           <div className="p-6 border-b border-slate-200 flex items-center justify-between shrink-0">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                <span>School Manager</span>
+                <span>Gestão Escolar</span>
               </h1>
-              <p className="text-slate-500 text-sm mt-1">Super Admin Platform</p>
+              <p className="text-slate-500 text-sm mt-1">Plataforma Super Admin</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -99,14 +99,26 @@ export function Layout() {
           </nav>
 
           <div className="p-4 border-t border-slate-200 shrink-0 bg-white">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold">
+                A
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-900 truncate">
+                  Admin Geral
+                </p>
+                <p className="text-xs text-slate-500 truncate">admin@yhanko.com</p>
+              </div>
+            </div>
             <button
               onClick={() => {
-                logout(); navigate("/");
+                logout();
+                navigate("/login");
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-150 font-medium text-sm"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
             >
-              <LogOut className="w-5 h-5" />
-              <span>Sair da Conta</span>
+              <LogOut className="w-4 h-4" />
+              <span>Sair</span>
             </button>
           </div>
         </div>

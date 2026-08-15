@@ -112,48 +112,48 @@ export function PlatformsManager() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Platform Integrations</h2>
-        <p className="text-slate-600 mt-1">Monitor platform usage and integration status</p>
+        <h2 className="text-3xl font-bold text-slate-900">Integrações de Plataforma</h2>
+        <p className="text-slate-600 mt-1">Monitorizar o uso da plataforma e estado da integração</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <Activity className="w-5 h-5 text-green-500" />
-            <h3 className="text-sm font-medium text-slate-600">Active Platforms</h3>
+            <h3 className="text-sm font-medium text-slate-600">Plataformas Ativas</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.active}</p>
-          <p className="text-xs text-slate-500 mt-1">of {platforms.length} total</p>
+          <p className="text-xs text-slate-500 mt-1">de {platforms.length} total</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <Users className="w-5 h-5 text-blue-500" />
-            <h3 className="text-sm font-medium text-slate-600">Total Active Users</h3>
+            <h3 className="text-sm font-medium text-slate-600">Total de Usuários Ativos</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.totalUsers.toLocaleString()}</p>
-          <p className="text-xs text-slate-500 mt-1">across all platforms</p>
+          <p className="text-xs text-slate-500 mt-1">em todas as plataformas</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
           <div className="flex items-center gap-3 mb-2">
             <Clock className="w-5 h-5 text-amber-500" />
-            <h3 className="text-sm font-medium text-slate-600">Maintenance</h3>
+            <h3 className="text-sm font-medium text-slate-600">Manutenção</h3>
           </div>
           <p className="text-2xl font-bold text-slate-900">{stats.maintenance}</p>
-          <p className="text-xs text-slate-500 mt-1">platforms under maintenance</p>
+          <p className="text-xs text-slate-500 mt-1">plataformas em manutenção</p>
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
         <div className="flex items-center gap-4 mb-6">
-          <label className="text-sm font-medium text-slate-700">Filter by School:</label>
+          <label className="text-sm font-medium text-slate-700">Filtrar por Escola:</label>
           <select
             value={selectedSchool}
             onChange={(e) => setSelectedSchool(e.target.value)}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
           >
-            <option value="all">All Schools</option>
+            <option value="all">Todas as Escolas</option>
             {schools.map(school => (
               <option key={school.id} value={school.id}>{school.name}</option>
             ))}
@@ -180,30 +180,30 @@ export function PlatformsManager() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Platform Type</span>
+                  <span className="text-sm text-slate-600">Tipo de Plataforma</span>
                   <span className="text-sm font-medium text-slate-900 capitalize">
                     {platform.platform_type}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Active Users</span>
+                  <span className="text-sm text-slate-600">Usuários Ativos</span>
                   <span className="text-sm font-medium text-slate-900">
                     {platform.active_users_count.toLocaleString()}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Last Sync</span>
+                  <span className="text-sm text-slate-600">Última Sincronização</span>
                   <span className="text-sm font-medium text-slate-900">
                     {platform.last_sync
                       ? new Date(platform.last_sync).toLocaleDateString()
-                      : 'Never'}
+                      : 'Nunca'}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">Created</span>
+                  <span className="text-sm text-slate-600">Criado em</span>
                   <span className="text-sm font-medium text-slate-900">
                     {new Date(platform.created_at).toLocaleDateString()}
                   </span>
@@ -215,13 +215,13 @@ export function PlatformsManager() {
 
         {filteredPlatforms.length === 0 && (
           <div className="text-center py-8 text-slate-500">
-            No platforms found for this criteria.
+            Nenhuma plataforma encontrada com este critério.
           </div>
         )}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="text-lg font-bold text-slate-900 mb-4">Platform Types Distribution</h3>
+        <h3 className="text-lg font-bold text-slate-900 mb-4">Distribuição por Tipos de Plataforma</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {['mobile', 'web', 'desktop', 'api'].map(type => {
             const count = platforms.filter(p => p.platform_type === type as any).length;
