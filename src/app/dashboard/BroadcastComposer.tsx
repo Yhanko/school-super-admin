@@ -39,7 +39,7 @@ export function BroadcastComposer() {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 mt-8 p-6">
       <div className="flex items-center gap-3 mb-4">
-        <Send className="w-6 h-6 text-blue-500" />
+        <Send className="w-6 h-6 text-purple-500" />
         <h3 className="text-lg font-bold text-slate-900">Avisos Globais (Broadcast)</h3>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -47,7 +47,7 @@ export function BroadcastComposer() {
           <label className="block text-sm font-medium text-slate-700 mb-1">Tipo</label>
           <select 
             {...register('type')} 
-            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
           >
             <option value="info">Informação</option>
             <option value="warning">Aviso</option>
@@ -60,7 +60,7 @@ export function BroadcastComposer() {
           <textarea 
             {...register('message')} 
             rows={3} 
-            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none" 
+            className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all resize-none" 
             placeholder="Escreva o aviso que todas as escolas verão..."
           />
           {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message.message}</p>}
@@ -68,7 +68,7 @@ export function BroadcastComposer() {
         <button 
           type="submit" 
           disabled={loading} 
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
         >
           {loading ? 'A enviar...' : 'Transmitir Aviso'}
         </button>

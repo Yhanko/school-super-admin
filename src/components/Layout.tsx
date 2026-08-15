@@ -50,21 +50,21 @@ export function Layout() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 border-r border-slate-800/60 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full max-h-screen">
-          <div className="p-6 border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="p-6 border-b border-slate-200 flex items-center justify-between shrink-0">
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 <span>School Manager</span>
               </h1>
-              <p className="text-slate-400 text-sm mt-1">Super Admin Platform</p>
+              <p className="text-slate-500 text-sm mt-1">Super Admin Platform</p>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              className="lg:hidden text-slate-500 hover:text-slate-900 p-1 rounded-lg hover:bg-slate-100"
             >
               <X className="w-5 h-5" />
             </button>
@@ -83,8 +83,8 @@ export function Layout() {
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-sm transition-all duration-150 ${
                     isActive
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                      : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                      ? "bg-purple-600 text-white shadow-md shadow-purple-600/20"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-slate-400"}`} />
@@ -94,12 +94,12 @@ export function Layout() {
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-800 shrink-0 bg-slate-900">
+          <div className="p-4 border-t border-slate-200 shrink-0 bg-white">
             <button
               onClick={() => {
                 logout(); navigate("/");
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-150 font-medium text-sm"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all duration-150 font-medium text-sm"
             >
               <LogOut className="w-5 h-5" />
               <span>Sair da Conta</span>
