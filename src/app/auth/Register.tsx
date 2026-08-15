@@ -7,6 +7,7 @@ import { authSchema, AuthSchema } from "../../services/schema/auth";
 import { useNavigate } from 'react-router-dom';
 import api, { AxiosError } from '../../services/api/axios';
 import { useAuthStore } from "../../store/authStore";
+import YhankoLogo from "../../assets/yhankoIMG.png";
 
 export function Register() {
   const [loading, setLoading] = useState(false);
@@ -48,11 +49,11 @@ export function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="bg-slate-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <LogIn className="w-8 h-8 text-white" />
+          <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
+            <img src={YhankoLogo} alt="Yhanko Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900">School Manager</h1>
           <p className="text-slate-600 mt-2">Create Super Admin Account</p>
@@ -104,7 +105,7 @@ export function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-slate-900 text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-purple-600 text-white py-3 rounded-lg font-medium hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               'Creating Account...'
@@ -119,7 +120,7 @@ export function Register() {
         <div className="mt-6 text-center">
           <button
             onClick={() => navigate('/')}
-            className="text-slate-600 hover:text-slate-900 text-sm transition"
+            className="text-slate-600 hover:text-purple-600 font-medium text-sm transition"
           >
             Already have an account? Sign In
           </button>
