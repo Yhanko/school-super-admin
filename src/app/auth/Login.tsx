@@ -17,6 +17,7 @@ export function Login() {
     register,
     handleSubmit,
     reset,
+    formState: { errors }
   } = useForm<AuthSchema>({
     resolver: zodResolver(authSchema),
   });
@@ -67,6 +68,7 @@ export function Login() {
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
               required
             />
+            {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -78,6 +80,7 @@ export function Login() {
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none transition"
               required
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -98,6 +101,7 @@ export function Login() {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
           </div>
           <button
             type="submit"

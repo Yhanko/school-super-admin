@@ -24,10 +24,10 @@ export function Students() {
         name: user.name,
         schoolId: user.institutionId || '',
         schoolName: user.institution?.name || 'N/A',
-        class: 'N/A', // from relations if existed
-        grade: 'N/A',
+        class: user.className || 'N/A',
+        grade: user.gradeName || 'N/A',
         parentName: user.parent?.name || 'N/A',
-        teachers: [],
+        teachers: user.teachers || [],
         paidPayments: 0,
         totalPayments: 0,
         overduePayments: 0,

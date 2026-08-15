@@ -25,8 +25,8 @@ export function Teachers() {
         email: user.email,
         schoolId: user.institutionId || '',
         schoolName: user.institution?.name || 'N/A',
-        totalParents: 0,
-        totalStudents: 0,
+        totalParents: user.totalParents || 0,
+        totalStudents: user.totalStudents || 0,
         enrollmentDate: new Date(user.createdAt),
         isActive: true,
         actions: []

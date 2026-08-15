@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api/axios';
 import toast from 'react-hot-toast';
 import { Plus, X, Trash2 } from '../../lib/icons';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { planSchema, PlanSchema } from '../../services/schema/plan';
 
 type Plan = {
   id: string;
@@ -20,13 +23,14 @@ export default function PlansPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
   
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    maxStudents: '',
-    maxTeachers: '',
-    maxParents: '',
-    maxStaff: '',
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors }
+  } = useForm<PlanSchema>({
+    resolver: zodResolver(planSchema)
   });
 
   useEffect(() => {
@@ -47,38 +51,37 @@ export default function PlansPage() {
   const handleOpenModal = (plan?: Plan) => {
     if (plan) {
       setEditingPlan(plan);
-      setFormData({
+      reset({
         name: plan.name,
-        price: plan.price.toString(),
-        maxStudents: plan.maxStudents ? plan.maxStudents.toString() : '',
-        maxTeachers: plan.maxTeachers ? plan.maxTeachers.toString() : '',
-        maxParents: plan.maxParents ? plan.maxParents.toString() : '',
-        maxStaff: plan.maxStaff ? plan.maxStaff.toString() : '',
+        price: plan.price,
+        maxStudents: plan.maxStudents ?? null,
+        maxTeachers: plan.maxTeachers ?? null,
+        maxParents: plan.maxParents ?? null,
+        maxStaff: plan.maxStaff ?? null,
       });
     } else {
       setEditingPlan(null);
-      setFormData({
+      reset({
         name: '',
-        price: '',
-        maxStudents: '',
-        maxTeachers: '',
-        maxParents: '',
-        maxStaff: '',
+        price: 0,
+        maxStudents: null,
+        maxTeachers: null,
+        maxParents: null,
+        maxStaff: null,
       });
     }
     setShowModal(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: PlanSchema) => {
     try {
       const payload = {
-        name: formData.name,
-        price: parseFloat(formData.price),
-        maxStudents: formData.maxStudents ? parseInt(formData.maxStudents) : null,
-        maxTeachers: formData.maxTeachers ? parseInt(formData.maxTeachers) : null,
-        maxParents: formData.maxParents ? parseInt(formData.maxParents) : null,
-        maxStaff: formData.maxStaff ? parseInt(formData.maxStaff) : null,
+        name: data.name,
+        price: data.price,
+        maxStudents: data.maxStudents,
+        maxTeachers: data.maxTeachers,
+        maxParents: data.maxParents,
+        maxStaff: data.maxStaff,
         features: []
       };
 
@@ -187,29 +190,27 @@ export default function PlansPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6">
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Nome do Plano *</label>
                     <input
                       type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      {...register('name')}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
-                      required
                     />
+                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
                   </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Preço Mensal ($) *</label>
                     <input
                       type="number"
                       step="0.01"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      {...register('price', { valueAsNumber: true })}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
-                      required
                     />
+                    {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
                   </div>
                 </div>
 
@@ -221,44 +222,44 @@ export default function PlansPage() {
                       <input
                         type="number"
                         min="1"
-                        value={formData.maxStudents}
-                        onChange={(e) => setFormData({ ...formData, maxStudents: e.target.value })}
+                        {...register('maxStudents', { setValueAs: v => v === "" || Number.isNaN(v) ? null : parseInt(v, 10) })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
                         placeholder="Ilimitado"
                       />
+                      {errors.maxStudents && <p className="text-red-500 text-xs mt-1">{errors.maxStudents.message}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Máx Professores</label>
                       <input
                         type="number"
                         min="1"
-                        value={formData.maxTeachers}
-                        onChange={(e) => setFormData({ ...formData, maxTeachers: e.target.value })}
+                        {...register('maxTeachers', { setValueAs: v => v === "" || Number.isNaN(v) ? null : parseInt(v, 10) })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
                         placeholder="Ilimitado"
                       />
+                      {errors.maxTeachers && <p className="text-red-500 text-xs mt-1">{errors.maxTeachers.message}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Máx Encarregados</label>
                       <input
                         type="number"
                         min="1"
-                        value={formData.maxParents}
-                        onChange={(e) => setFormData({ ...formData, maxParents: e.target.value })}
+                        {...register('maxParents', { setValueAs: v => v === "" || Number.isNaN(v) ? null : parseInt(v, 10) })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
                         placeholder="Ilimitado"
                       />
+                      {errors.maxParents && <p className="text-red-500 text-xs mt-1">{errors.maxParents.message}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Máx Funcionários</label>
                       <input
                         type="number"
                         min="1"
-                        value={formData.maxStaff}
-                        onChange={(e) => setFormData({ ...formData, maxStaff: e.target.value })}
+                        {...register('maxStaff', { setValueAs: v => v === "" || Number.isNaN(v) ? null : parseInt(v, 10) })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none"
                         placeholder="Ilimitado"
                       />
+                      {errors.maxStaff && <p className="text-red-500 text-xs mt-1">{errors.maxStaff.message}</p>}
                     </div>
                   </div>
                 </div>

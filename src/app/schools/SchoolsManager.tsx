@@ -9,6 +9,9 @@ import {
 import toast from 'react-hot-toast';
 import { SchoolsList } from "./Shools"
 import api from '../../services/api/axios';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { schoolSchema, SchoolSchema } from '../../services/schema/school';
 
 // Dados fictícios para simular a resposta do Supabase
 const mockSchools: School[] = [
@@ -98,51 +101,33 @@ export function SchoolsManager() {
     api.get('/super-admin/plans').then(res => setPlans(res.data)).catch(console.error);
   }, []);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    director: '',
-    email: '',
-    phone: '',
-    address: '',
-    planId: '',
-    password: '',
-    confirmPassword: '',
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<SchoolSchema>({
+    resolver: zodResolver(schoolSchema)
   });
 
   const resetForm = () => {
-    setFormData({
-      name: '',
-      director: '',
-      email: '',
-      phone: '',
-      address: '',
-      planId: '',
-      password: '',
-      confirmPassword: '',
-    });
+    reset();
     setShowModal(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('As senhas não coincidem!');
-      return;
-    }
-
+  const onSubmit = async (data: SchoolSchema) => {
     setLoading(true);
 
     try {
       await api.post('/super-admin/schools', {
-        schoolName: formData.name,
-        schoolEmail: formData.email,
-        schoolPhone: formData.phone,
-        schoolAddress: formData.address,
-        adminName: formData.director,
-        adminEmail: formData.email,
-        adminPassword: formData.password,
-        planId: formData.planId
+        schoolName: data.schoolName,
+        schoolEmail: data.email,
+        schoolPhone: data.phone,
+        schoolAddress: data.address,
+        adminName: data.adminName,
+        adminEmail: data.email,
+        adminPassword: data.password,
+        planId: data.planId
       });
 
       resetForm();
@@ -185,7 +170,7 @@ export function SchoolsManager() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -193,11 +178,10 @@ export function SchoolsManager() {
                   </label>
                   <input
                     type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    {...register('schoolName')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    required
                   />
+                  {errors.schoolName && <p className="text-red-500 text-xs mt-1">{errors.schoolName.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -205,11 +189,10 @@ export function SchoolsManager() {
                   </label>
                   <input
                     type="text"
-                    value={formData.director}
-                    onChange={(e) => setFormData({ ...formData, director: e.target.value })}
+                    {...register('adminName')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    required
                   />
+                  {errors.adminName && <p className="text-red-500 text-xs mt-1">{errors.adminName.message}</p>}
                 </div>
               </div>
 
@@ -218,21 +201,20 @@ export function SchoolsManager() {
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email *</label>
                   <input
                     type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    {...register('email')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    required
                   />
+                  {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Telefone</label>
                   <input
                     type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    {...register('phone')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
                   />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
                 </div>
               </div>
 
@@ -241,24 +223,23 @@ export function SchoolsManager() {
                   <label className="block text-sm font-medium text-slate-700 mb-2">Endereço</label>
                   <input
                     type="text"
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    {...register('address')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
                   />
+                  {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address.message}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Plano de Assinatura *</label>
                   <select
-                    value={formData.planId}
-                    onChange={(e) => setFormData({ ...formData, planId: e.target.value })}
+                    {...register('planId')}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    required
                   >
                     <option value="">Selecione um plano</option>
                     {plans.map(p => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                   </select>
+                  {errors.planId && <p className="text-red-500 text-xs mt-1">{errors.planId.message}</p>}
                 </div>
               </div>
 
@@ -270,10 +251,8 @@ export function SchoolsManager() {
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      {...register('password')}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                      required
                     />
                     <button
                       type="button"
@@ -283,6 +262,7 @@ export function SchoolsManager() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                 </div>
 
                 <div>
@@ -292,10 +272,8 @@ export function SchoolsManager() {
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? "text" : "password"}
-                      value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      {...register('confirmPassword')}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                      required
                     />
                     <button
                       type="button"
@@ -305,6 +283,7 @@ export function SchoolsManager() {
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
+                  {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
                 </div>
               </div>
 
