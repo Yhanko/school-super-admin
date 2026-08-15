@@ -35,7 +35,7 @@ export function HealthReport() {
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-8">
       <div className="p-6 border-b border-slate-200 flex items-center gap-3">
         <Activity className="w-6 h-6 text-indigo-500" />
-        <h3 className="text-lg font-bold text-slate-900">Relat�rio de Sa�de (Churn Rate)</h3>
+        <h3 className="text-lg font-bold text-slate-900">Relatório de Saúde (Churn Rate)</h3>
       </div>
       <div className="p-6">
         <table className="w-full text-left border-collapse">
@@ -44,7 +44,7 @@ export function HealthReport() {
               <th className="pb-3">Escola</th>
               <th className="pb-3">Status</th>
               <th className="pb-3">Ativos 15D / Total</th>
-              <th className="pb-3">Sa�de</th>
+              <th className="pb-3">Saúde</th>
             </tr>
           </thead>
           <tbody>
