@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import toast from 'react-hot-toast';
-import { Building2, Search, Eye, EyeOff, Ban, Trash2, GraduationCap, Lock, Clock, User, X } from "../../lib/icons";
+import { Building2, Search, Eye, EyeOff, Ban, Trash2, GraduationCap, Lock, Clock, User, X, Download } from "../../lib/icons";
+import { exportToCSV } from "../../lib/exportToCSV";
 
 type School = {
   id: string;
@@ -390,6 +391,13 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                     </div>
                     <button onClick={handleSearch} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                         Buscar
+                    </button>
+                    <button
+                        onClick={() => exportToCSV(schools, 'schools')}
+                        className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition flex items-center gap-2 font-medium"
+                    >
+                        <Download className="w-5 h-5" />
+                        Exportar CSV
                     </button>
                   </div>
         </div>

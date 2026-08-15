@@ -8,6 +8,8 @@ import { PlatformsManager } from "../app/manage-plataform/PlatformsManager";
 import PlansPage from "../app/plans/page";
 import LogsPage from "../app/logs/page";
 import { LeadsPage } from "../app/leads/LeadsPage";
+import { TicketsPage } from "../app/tickets/TicketsPage";
+import { SettingsPage } from "../app/settings/SettingsPage";
 
 export const privateRoutes = [
     { path: "/dashboard", element: (
@@ -46,5 +48,11 @@ export const privateRoutes = [
 
     { path: "/logs", element: (
         <LogsPage />
+    ) },
+    { path: "/tickets", element: (
+        <TicketsPage />
+    ) },
+    { path: "/settings", element: (
+        <SettingsPage />
     ) },
 ];

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle } from '../../lib/icons';
+import { DollarSign, Search, Filter, TrendingUp, Clock, CheckCircle, XCircle, Download, FileText } from '../../lib/icons';
 import api from '../../services/api/axios';
+import { exportToCSV } from '../../lib/exportToCSV';
+import { generateInvoice } from '../../lib/generateInvoice';
 
 interface Payment {
   id: string;
@@ -110,9 +112,18 @@ export function PaymentsManager() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-slate-900">Payments & Transactions</h2>
-        <p className="text-slate-600 mt-1">Track all payment activities across schools</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-3xl font-bold text-slate-900">Payments & Transactions</h2>
+          <p className="text-slate-600 mt-1">Track all payment activities across schools</p>
+        </div>
+        <button
+          onClick={() => exportToCSV(payments, 'payments')}
+          className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg font-medium hover:bg-slate-50 transition flex items-center gap-2"
+        >
+          <Download className="w-5 h-5" />
+          Exportar CSV
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -200,6 +211,7 @@ export function PaymentsManager() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Type</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Method</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Date</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">Recibo</th>
               </tr>
             </thead>
             <tbody>
@@ -231,6 +243,15 @@ export function PaymentsManager() {
                   </td>
                   <td className="py-3 px-4 text-sm text-slate-600">
                     {new Date(payment.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="py-3 px-4 text-sm text-slate-600 text-right">
+                    <button
+                      onClick={() => generateInvoice(payment)}
+                      title="Baixar Recibo PDF"
+                      className="text-indigo-600 hover:text-indigo-800 transition"
+                    >
+                      <FileText className="w-5 h-5 inline" />
+                    </button>
                   </td>
                 </tr>
               ))}

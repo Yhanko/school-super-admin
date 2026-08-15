@@ -10,7 +10,9 @@ import { Map, FileText,
   X,
   Users2,
   User,
-  SquareUser 
+  SquareUser,
+  MessageSquare,
+  Settings
 } from "../lib/icons";
 
 import { useAuthStore } from '../store/authStore';
@@ -30,7 +32,9 @@ export function Layout() {
     { name: "Payments", icon: DollarSign, path: "/payments" },
     { name: "Platforms", icon: Activity, path: "/platforms" },
     { name: "Planos e Preços", icon: Map, path: "/plans" },
+    { name: "Suporte", icon: MessageSquare, path: "/tickets" },
     { name: "Auditoria (Logs)", icon: FileText, path: "/logs" },
+    { name: "Configurações", icon: Settings, path: "/settings" },
   ];
 
   return (
