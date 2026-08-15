@@ -19,25 +19,49 @@ export function Parents() {
   const loadParents = async () => {
     try {
       const response = await api.get('/super-admin/parents');
-      const formatted = response.data.map((user: any) => ({
-        id: user.id,
-        name: user.name,
-        schoolId: user.institutionId || '',
-        schoolName: user.institution?.name || 'N/A',
-        class: 'N/A', // from relations if existed
-        grade: 'N/A',
-        parentName: user.name,
-        teachers: [],
-        paidPayments: 0,
-        totalPayments: 0,
-        overduePayments: 0,
-        enrollmentDate: new Date(user.createdAt),
-        isActive: true,
-        lastLogin: undefined,
-        attendanceRate: 0,
-        averageGrade: 0,
-        actions: []
-      }));
+      const formatted = response.data.map((user: any) => {
+        const classNames: string[] = [];
+        const grades: string[] = [];
+        const teachers: Set<string> = new Set();
+        
+        if (user.children && user.children.length > 0) {
+           user.children.forEach((child: any) => {
+              if (child.enrollments && child.enrollments.length > 0) {
+                 child.enrollments.forEach((enrollment: any) => {
+                    if (enrollment.class) {
+                       classNames.push(enrollment.class.name);
+                       if (enrollment.class.grade) grades.push(enrollment.class.grade);
+                       if (enrollment.class.teachers) {
+                          enrollment.class.teachers.forEach((teacher: any) => {
+                             teachers.add(teacher.name);
+                          });
+                       }
+                    }
+                 });
+              }
+           });
+        }
+
+        return {
+          id: user.id,
+          name: user.name,
+          schoolId: user.institutionId || '',
+          schoolName: user.institution?.name || 'N/A',
+          class: classNames.length > 0 ? Array.from(new Set(classNames)).join(', ') : 'N/A',
+          grade: grades.length > 0 ? Array.from(new Set(grades)).join(', ') : 'N/A',
+          parentName: user.name,
+          teachers: Array.from(teachers),
+          paidPayments: 0,
+          totalPayments: 0,
+          overduePayments: 0,
+          enrollmentDate: new Date(user.createdAt),
+          isActive: true,
+          lastLogin: undefined,
+          attendanceRate: 0,
+          averageGrade: 0,
+          actions: []
+        };
+      });
       setParents(formatted);
     } catch (error) {
       console.error('Failed to load parents:', error);
