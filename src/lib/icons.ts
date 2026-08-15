@@ -30,7 +30,7 @@ import {
   Zap,
   Briefcase,
   UserCircle,
-  LogIn, Map, Ticket, FileText, Send, AlertTriangle, Database, Server, Download, Settings } from "lucide-react";
+  LogIn, Map, Ticket, FileText, Send, AlertTriangle, Database, Server, Download, Settings, MessageSquare } from "lucide-react";
 
 export {
   Plus,
@@ -46,6 +46,7 @@ export {
   Database,
   Server,
   Settings,
+  MessageSquare,
   Menu,
   X,
   Lock,
