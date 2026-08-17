@@ -11,6 +11,7 @@ export const planSchema = z.object({
   maxTeachers: z.number({ message: "Insira um número válido" }).min(1, "Deve ser no mínimo 1").nullable(),
   maxParents: z.number({ message: "Insira um número válido" }).min(1, "Deve ser no mínimo 1").nullable(),
   maxStaff: z.number({ message: "Insira um número válido" }).min(1, "Deve ser no mínimo 1").nullable(),
+  features: z.array(z.string()).default([]),
 });
 
 export type PlanSchema = z.infer<typeof planSchema>;

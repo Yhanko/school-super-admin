@@ -22,6 +22,7 @@ export default function PlansPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
+  const [featuresList, setFeaturesList] = useState<string[]>([]);
   
   const {
     register,
@@ -59,6 +60,7 @@ export default function PlansPage() {
         maxParents: plan.maxParents ?? null,
         maxStaff: plan.maxStaff ?? null,
       });
+      setFeaturesList(plan.features || []);
     } else {
       setEditingPlan(null);
       reset({
@@ -69,6 +71,7 @@ export default function PlansPage() {
         maxParents: null,
         maxStaff: null,
       });
+      setFeaturesList([]);
     }
     setShowModal(true);
   };
@@ -82,7 +85,7 @@ export default function PlansPage() {
         maxTeachers: data.maxTeachers,
         maxParents: data.maxParents,
         maxStaff: data.maxStaff,
-        features: []
+        features: featuresList.filter(f => f.trim() !== '')
       };
 
       if (editingPlan) {
@@ -153,6 +156,19 @@ export default function PlansPage() {
                 <span className="text-slate-600">Funcionários Máx:</span>
                 <span className="font-semibold text-slate-900">{plan.maxStaff || 'Ilimitado'}</span>
               </li>
+              {plan.features && plan.features.length > 0 && (
+                <li className="pt-2">
+                  <span className="text-slate-600 block mb-2 font-medium">Vantagens:</span>
+                  <ul className="space-y-1">
+                    {plan.features.map((f, i) => (
+                      <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">•</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              )}
             </ul>
 
             <div className="flex gap-3">
@@ -261,6 +277,46 @@ export default function PlansPage() {
                       />
                       {errors.maxStaff && <p className="text-red-500 text-xs mt-1">{errors.maxStaff.message}</p>}
                     </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-sm font-semibold text-slate-800">Vantagens / Funcionalidades</h3>
+                    <button
+                      type="button"
+                      onClick={() => setFeaturesList([...featuresList, ''])}
+                      className="text-xs bg-slate-100 text-slate-700 px-3 py-1 rounded hover:bg-slate-200 transition font-medium"
+                    >
+                      + Adicionar Vantagem
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {featuresList.map((feat, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={feat}
+                          onChange={(e) => {
+                            const newF = [...featuresList];
+                            newF[index] = e.target.value;
+                            setFeaturesList(newF);
+                          }}
+                          className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 outline-none text-sm"
+                          placeholder="Ex: Gestão de Turmas e Salas"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFeaturesList(featuresList.filter((_, i) => i !== index))}
+                          className="px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {featuresList.length === 0 && (
+                      <p className="text-sm text-slate-500 italic">Nenhuma vantagem adicionada.</p>
+                    )}
                   </div>
                 </div>
               </div>
