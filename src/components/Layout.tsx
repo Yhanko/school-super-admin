@@ -27,7 +27,7 @@ export function Layout() {
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Interessados", icon: User, path: "/leads" },
     { name: "Escolas", icon: School, path: "/schools" },
-    { name: "Estudantes", icon: User, path: "/students" },
+    { name: "Alunos", icon: User, path: "/students" },
     { name: "Encarregados", icon: Users2, path: "/parents" },
     { name: "Professores", icon: SquareUser, path: "/teachers" },
     { name: "Pagamentos", icon: DollarSign, path: "/payments" },

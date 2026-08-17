@@ -30,7 +30,7 @@ export function StudentModal({ student, onClose }: StudentModalProps) {
       <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden animate-scale-in">
         <div className="flex items-center justify-between p-6 border-b border-slate-200">
           <h2 className="text-2xl font-bold text-slate-900">
-            Detalhes do Estudante
+            Detalhes do Aluno
           </h2>
           <button
             onClick={onClose}

@@ -110,7 +110,7 @@ export function ParentsTable({ parents, onSelectParent }: ParentsTableProps) {
       </div>
       {parents.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          Nenhum estudante encontrado
+          Nenhum aluno encontrado
         </div>
       )}
     </div>

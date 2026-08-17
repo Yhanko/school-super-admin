@@ -144,7 +144,7 @@ export function Parents() {
         />
 
         <div className="mt-6 text-sm text-muted-foreground animate-fade-in">
-          Total de estudantes: {filteredParents.length}
+          Total de alunos: {filteredParents.length}
         </div>
       </div>
 

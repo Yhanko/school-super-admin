@@ -206,7 +206,7 @@ export function PaymentsManager() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Status</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Escola</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Encarregado</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Estudante</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Aluno</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Valor</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Tipo</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-slate-700">Método</th>

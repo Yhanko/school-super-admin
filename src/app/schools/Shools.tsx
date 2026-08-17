@@ -499,24 +499,24 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                           </div>
                         </td>
                         <td className="p-4">
-                          <div className="flex gap-6 justify-center items-center">
-                              <button title="Ver detalhes" onClick={() => handleViewDetails(school)}>
-                                <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800 transition" />
+                          <div className="flex gap-8 justify-center items-center">
+                              <button title="Ver detalhes" onClick={() => handleViewDetails(school)} className="p-2 hover:bg-blue-50 rounded-full transition">
+                                <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800 transition" />
                               </button>
                             <button
                               onClick={() => handleChangeStatus(school)}
-                              className="text-orange-600 hover:text-orange-800 transition"
+                              className="p-2 hover:bg-orange-50 rounded-full text-orange-600 hover:text-orange-800 transition"
                               title="Alterar Estado"
                             >
-                              <Ban className="h-4 w-4" />
+                              <Ban className="h-5 w-5" />
                             </button>
-                            <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                            <div className="w-px h-6 bg-gray-300 mx-2"></div>
                             <button
                               onClick={() => handleDeleteSchool(school)}
-                              className="text-red-600 hover:text-red-800 transition"
+                              className="p-2 hover:bg-red-50 rounded-full text-red-600 hover:text-red-800 transition"
                               title="Remover escola"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-5 w-5" />
                             </button>
                           </div>
                         </td>

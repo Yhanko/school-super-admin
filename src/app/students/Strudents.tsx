@@ -68,7 +68,7 @@ export function Students() {
       <div className="max-w-[1600px] mx-auto">
         <header className="mb-8 animate-slide-down">
           <h1 className="text-4xl font-bold mb-2 text-black">
-            Gestão de Estudantes
+            Gestão de Alunos
           </h1>
         </header>
 
@@ -120,7 +120,7 @@ export function Students() {
         />
 
         <div className="mt-6 text-sm text-muted-foreground animate-fade-in">
-          Total de estudantes: {filteredStudents.length}
+          Total de alunos: {filteredStudents.length}
         </div>
       </div>
 

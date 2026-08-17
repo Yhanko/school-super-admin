@@ -103,7 +103,7 @@ export function Dashboard() {
       trend: '+2 este mês'
     },
     {
-      title: 'Total Estudantes',
+      title: 'Total Alunos',
       value: stats.totalStudents.toLocaleString(),
       subtitle: 'Em todas as escolas',
       icon: GraduationCap,
