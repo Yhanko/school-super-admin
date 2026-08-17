@@ -499,7 +499,7 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                           </div>
                         </td>
                         <td className="p-4">
-                          <div className="flex gap-2 justify-center">
+                          <div className="flex gap-6 justify-center items-center">
                               <button title="Ver detalhes" onClick={() => handleViewDetails(school)}>
                                 <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800 transition" />
                               </button>
@@ -510,6 +510,7 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                             >
                               <Ban className="h-4 w-4" />
                             </button>
+                            <div className="w-px h-4 bg-gray-300 mx-1"></div>
                             <button
                               onClick={() => handleDeleteSchool(school)}
                               className="text-red-600 hover:text-red-800 transition"
