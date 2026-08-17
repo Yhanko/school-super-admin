@@ -11,7 +11,7 @@ type School = {
   address?: string;
   phone?: string;
   email?: string;
-  status: "active" | "blocked" | "inactive";
+  status: "active" | "suspended" | "payment_restricted" | "blocked" | "inactive";
   studentsCount: number;
   teachersCount: number;
   monthlyRevenue: number;
@@ -243,7 +243,8 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
-  const [actionType, setActionType] = useState<"block" | "delete" | null>(null);
+  const [actionType, setActionType] = useState<string | null>(null);
+  const [newStatus, setNewStatus] = useState<string>("active");
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
@@ -293,9 +294,10 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
     }
   };
 
-  const handleBlockSchool = (school: School) => {
+  const handleChangeStatus = (school: School) => {
     setSelectedSchool(school);
-    setActionType("block");
+    setNewStatus(school.status);
+    setActionType("change_status");
   };
 
   const handleDeleteSchool = (school: School) => {
@@ -308,23 +310,26 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
     setShowDetailsModal(true);
   };
 
-  const confirmAction = () => {
+  const confirmAction = async () => {
     if (!selectedSchool) return;
 
-    if (actionType === "block") {
-      setSchools(schools.map(s =>
-        s.id === selectedSchool.id
-          ? { ...s, status: s.status === "blocked" ? "active" : "blocked" }
-          : s
-      ));
-      toast.success(
-        selectedSchool.status === "blocked"
-          ? `Escola ${selectedSchool.name} desbloqueada com sucesso!`
-          : `Escola ${selectedSchool.name} bloqueada com sucesso!`
-      );
-    } else if (actionType === "delete") {
-      setSchools(schools.filter(s => s.id !== selectedSchool.id));
-      toast.success(`Escola ${selectedSchool.name} removida com sucesso!`);
+    try {
+      if (actionType === "change_status") {
+        await api.put(`/super-admin/schools/${selectedSchool.id}/status`, { status: newStatus });
+        setSchools(schools.map(s =>
+          s.id === selectedSchool.id
+            ? { ...s, status: newStatus as any }
+            : s
+        ));
+        toast.success(`Estado da escola atualizado com sucesso!`);
+      } else if (actionType === "delete") {
+        // await api.delete(`/super-admin/schools/${selectedSchool.id}`); // Uncomment if delete endpoint exists
+        setSchools(schools.filter(s => s.id !== selectedSchool.id));
+        toast.success(`Escola ${selectedSchool.name} removida com sucesso!`);
+      }
+    } catch (error) {
+      toast.error('Erro ao realizar a operação');
+      console.error(error);
     }
 
     setSelectedSchool(null);
@@ -332,15 +337,14 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
   };
 
   const getStatusBadge = (status: School["status"]) => {
-    // Nota: As classes 'default', 'destructive', 'secondary' não estão definidas aqui.
-    // Assumindo que são classes Tailwind ou de um framework de componentes (shadcn/ui, etc.)
-    // Vou usar classes Tailwind simples para simular.
     const variants = {
       active: { className: "bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Ativa" },
       blocked: { className: "bg-red-100 text-red-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Bloqueada" },
-      inactive: { className: "bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Inativa" }
+      inactive: { className: "bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Inativa" },
+      suspended: { className: "bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Suspensa" },
+      payment_restricted: { className: "bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs font-medium", label: "Pgto. Restrito" }
     };
-    return variants[status];
+    return variants[status as keyof typeof variants] || variants.inactive;
   };
 
   return (
@@ -500,9 +504,9 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                                 <Eye className="h-4 w-4 text-blue-600 hover:text-blue-800 transition" />
                               </button>
                             <button
-                              onClick={() => handleBlockSchool(school)}
-                              className={school.status === "blocked" ? "text-green-600 hover:text-green-800 transition" : "text-orange-600 hover:text-orange-800 transition"}
-                              title={school.status === "blocked" ? "Desbloquear" : "Bloquear"}
+                              onClick={() => handleChangeStatus(school)}
+                              className="text-orange-600 hover:text-orange-800 transition"
+                              title="Alterar Estado"
                             >
                               <Ban className="h-4 w-4" />
                             </button>
@@ -540,19 +544,32 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
         <div role="dialog" aria-modal="true" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <div className="text-lg font-semibold mb-2 text-slate-900">
-              {actionType === "block"
-                ? selectedSchool.status === "blocked"
-                  ? "Desbloquear Escola"
-                  : "Bloquear Escola"
-                : "Remover Escola"}
+              {actionType === "change_status" ? "Alterar Estado da Escola" : "Remover Escola"}
             </div>
-            <div className="text-sm text-slate-600 mb-4">
-              {actionType === "block"
-                ? selectedSchool.status === "blocked"
-                  ? `Tem certeza que deseja desbloquear a escola "${selectedSchool.name}"? A escola voltará a ter acesso total à plataforma.`
-                  : `Tem certeza que deseja bloquear a escola "${selectedSchool.name}"? Isso impedirá o acesso de todos os usuários vinculados a esta escola.`
-                : `Tem certeza que deseja remover a escola "${selectedSchool.name}"? Esta ação não pode ser desfeita.`}
-            </div>
+            
+            {actionType === "change_status" && (
+              <div className="mb-4">
+                <p className="text-sm text-slate-600 mb-3">
+                  Selecione o novo estado para a escola <strong>{selectedSchool.name}</strong>:
+                </p>
+                <select 
+                  className="w-full border border-slate-300 rounded-lg p-2 outline-none focus:ring-2 focus:ring-indigo-600"
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                >
+                  <option value="active">Ativa</option>
+                  <option value="suspended">Suspensa</option>
+                  <option value="payment_restricted">Pagamento Restrito</option>
+                  <option value="blocked">Bloqueada</option>
+                </select>
+              </div>
+            )}
+
+            {actionType === "delete" && (
+              <div className="text-sm text-slate-600 mb-4">
+                Tem certeza que deseja remover a escola "{selectedSchool.name}"? Esta ação não pode ser desfeita.
+              </div>
+            )}
             <div className="flex justify-end gap-2">
               <button 
                 onClick={() => { setSelectedSchool(null); setActionType(null); }}

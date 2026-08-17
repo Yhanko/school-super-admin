@@ -12,7 +12,8 @@ import { Map, FileText,
   User,
   SquareUser,
   MessageSquare,
-  Settings
+  Settings,
+  AlertOctagon
 } from "../lib/icons";
 
 import { useAuthStore } from '../store/authStore';
@@ -32,6 +33,7 @@ export function Layout() {
     { name: "Pagamentos", icon: DollarSign, path: "/payments" },
     { name: "Plataformas", icon: Activity, path: "/platforms" },
     { name: "Planos e Preços", icon: Map, path: "/plans" },
+    { name: "Faturação e Dívidas", icon: AlertOctagon, path: "/billing" },
     { name: "Suporte", icon: MessageSquare, path: "/tickets" },
     { name: "Auditoria (Logs)", icon: FileText, path: "/logs" },
     { name: "Configurações", icon: Settings, path: "/settings" },
