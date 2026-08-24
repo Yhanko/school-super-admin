@@ -112,30 +112,56 @@ export function SchoolsManager() {
 
   const resetForm = () => {
     reset();
+    setEditingSchool(null);
     setShowModal(false);
+  };
+
+  const handleEdit = (school: any) => {
+    setEditingSchool(school);
+    reset({
+      schoolName: school.name,
+      email: school.email,
+      phone: school.phone || '',
+      address: school.address || '',
+      adminName: school.director || '',
+      planId: school.subscription_plan || '',
+    });
+    setShowModal(true);
   };
 
   const onSubmit = async (data: SchoolSchema) => {
     setLoading(true);
 
     try {
-      await api.post('/super-admin/schools', {
-        schoolName: data.schoolName,
-        schoolEmail: data.email,
-        schoolPhone: data.phone,
-        schoolAddress: data.address,
-        adminName: data.adminName,
-        adminEmail: data.email,
-        adminPassword: data.password,
-        planId: data.planId
-      });
+      if (editingSchool) {
+        await api.put(`/super-admin/schools/${editingSchool.id}`, {
+          schoolName: data.schoolName,
+          schoolEmail: data.email,
+          schoolPhone: data.phone,
+          schoolAddress: data.address,
+          adminName: data.adminName,
+          planId: data.planId
+        });
+        toast.success('Escola atualizada com sucesso!');
+      } else {
+        await api.post('/super-admin/schools', {
+          schoolName: data.schoolName,
+          schoolEmail: data.email,
+          schoolPhone: data.phone,
+          schoolAddress: data.address,
+          adminName: data.adminName,
+          adminEmail: data.email,
+          adminPassword: data.password,
+          planId: data.planId
+        });
+        toast.success('Escola criada com sucesso!');
+      }
 
       resetForm();
       setRefreshTrigger(prev => prev + 1);
-      toast.success('Escola criada com sucesso!');
     } catch (error) {
-      console.error('Failed to create school:', error);
-      toast.error('Erro ao criar escola');
+      console.error('Failed to save school:', error);
+      toast.error('Erro ao guardar escola');
     } finally {
       setLoading(false);
     }
@@ -156,7 +182,7 @@ export function SchoolsManager() {
           Adicionar Escola
         </button>
       </div>
-      <SchoolsList refreshTrigger={refreshTrigger} />
+      <SchoolsList refreshTrigger={refreshTrigger} onEdit={handleEdit} />
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -243,49 +269,51 @@ export function SchoolsManager() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Senha (Admin) *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      {...register('password')}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+              {!editingSchool && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Senha (Admin) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        {...register('password')}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                   </div>
-                  {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Confirmar Senha *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      {...register('confirmPassword')}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Confirmar Senha *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        {...register('confirmPassword')}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                    {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
                   </div>
-                  {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword.message}</p>}
                 </div>
-              </div>
+              )}
 
               <div className="flex justify-end gap-3 pt-6 border-t border-slate-200">
                 <button

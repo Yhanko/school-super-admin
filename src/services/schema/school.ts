@@ -18,9 +18,14 @@ export const schoolSchema = z.object({
     .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula")
     .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula")
     .regex(/[0-9]/, "A senha deve conter pelo menos um número")
-    .regex(/[^A-Za-z0-9]/, "A senha deve conter pelo menos um caractere especial"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
+    .regex(/[^A-Za-z0-9]/, "A senha deve conter pelo menos um caractere especial")
+    .optional()
+    .or(z.literal("")),
+  confirmPassword: z.string().optional().or(z.literal(""))
+}).refine((data) => {
+  if (!data.password && !data.confirmPassword) return true;
+  return data.password === data.confirmPassword;
+}, {
   message: "As senhas não coincidem",
   path: ["confirmPassword"]
 });

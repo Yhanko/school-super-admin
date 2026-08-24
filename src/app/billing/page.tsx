@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { Building2, Ban, Lock, Search, AlertOctagon, MessageSquare, Clock } from '../../lib/icons';
+import api from '../../services/api/axios';
 
 type DebtorsResponse = {
   id: string;
@@ -23,16 +24,10 @@ export default function BillingPage() {
 
   const fetchDebtors = async () => {
     try {
-      const res = await fetch('http://localhost:3000/super-admin/billing/debtors', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      if (!res.ok) throw new Error('Failed to fetch');
-      const data = await res.json();
-      setDebtors(data);
+      const res = await api.get('/super-admin/billing/debtors');
+      setDebtors(res.data);
     } catch (error) {
-      toast.error('Erro ao carregar escolas em dívida');
+      toast.error('Erro ao carregar escolas');
     } finally {
       setLoading(false);
     }
@@ -44,15 +39,7 @@ export default function BillingPage() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      const res = await fetch(`http://localhost:3000/super-admin/schools/${id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ status })
-      });
-      if (!res.ok) throw new Error('Failed to update status');
+      await api.put(`/super-admin/schools/${id}/status`, { status });
       toast.success('Estado atualizado com sucesso');
       fetchDebtors();
     } catch (error) {
@@ -67,7 +54,7 @@ export default function BillingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Faturação e Dívidas</h1>
-          <p className="text-slate-500 text-sm mt-1">Gere escolas com subscrições expiradas ou acessos restritos</p>
+          <p className="text-slate-500 text-sm mt-1">Gere todas as escolas, subscrições ativas e expiradas</p>
         </div>
       </div>
 
@@ -99,7 +86,7 @@ export default function BillingPage() {
               {loading ? (
                 <tr><td colSpan={4} className="p-6 text-center text-slate-500">A carregar...</td></tr>
               ) : filteredDebtors.length === 0 ? (
-                <tr><td colSpan={4} className="p-6 text-center text-slate-500">Nenhuma escola em dívida encontrada.</td></tr>
+                <tr><td colSpan={4} className="p-6 text-center text-slate-500">Nenhuma escola encontrada.</td></tr>
               ) : (
                 filteredDebtors.map((school) => {
                   const activeSub = school.subscriptions.find(s => s.status === 'active');

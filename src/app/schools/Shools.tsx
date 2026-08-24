@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import toast from 'react-hot-toast';
 import { Building2, Search, Eye, EyeOff, Ban, Trash2, GraduationCap, Lock, Clock, User, X, Download } from "../../lib/icons";
+import { Edit } from "lucide-react";
 import { exportToCSV } from "../../lib/exportToCSV";
 
 type School = {
@@ -238,7 +239,7 @@ const SchoolDetailsModal = ({ school, onClose }: SchoolDetailsModalProps) => {
 import api from '../../services/api/axios';
 import { useEffect } from 'react';
 
-export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
+export function SchoolsList({ refreshTrigger, onEdit }: { refreshTrigger?: number; onEdit?: (school: School) => void }) {
   const [schools, setSchools] = useState<School[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeSearchTerm, setActiveSearchTerm] = useState("");
@@ -503,6 +504,15 @@ export function SchoolsList({ refreshTrigger }: { refreshTrigger?: number }) {
                               <button title="Ver detalhes" onClick={() => handleViewDetails(school)} className="p-2 hover:bg-blue-50 rounded-full transition">
                                 <Eye className="h-5 w-5 text-blue-600 hover:text-blue-800 transition" />
                               </button>
+                            {onEdit && (
+                              <button
+                                onClick={() => onEdit(school)}
+                                className="p-2 hover:bg-emerald-50 rounded-full text-emerald-600 hover:text-emerald-800 transition"
+                                title="Editar Instituição"
+                              >
+                                <Edit className="h-5 w-5" />
+                              </button>
+                            )}
                             <button
                               onClick={() => handleChangeStatus(school)}
                               className="p-2 hover:bg-orange-50 rounded-full text-orange-600 hover:text-orange-800 transition"
