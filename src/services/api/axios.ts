@@ -19,10 +19,11 @@ api.interceptors.request.use(
   }
 );
 
+// Auto logout se der 401 e não estiver na página de login
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && window.location.pathname !== "/") {
       Cookies.remove("yhanko_super_admin_token", { path: '/' });
       Cookies.remove("yhanko_super_admin_user", { path: '/' });
       window.location.href = "/";
