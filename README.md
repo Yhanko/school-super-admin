@@ -66,15 +66,77 @@ Este projeto foi desenvolvido com as seguintes tecnologias:
 
 ---
 
-## 📦 Uso e Instalação do projeto
-```bash
-cd seu-repo
+## ⚙️ Variáveis de Ambiente
+
+Crie um arquivo `.env` baseado no `.env.example`:
 
 ```bash
+cp .env.example .env
+```
+
+| Variável | Descrição | Padrão |
+| :--- | :--- | :--- |
+| `VITE_SCHOOL_API_URL` | URL base da API backend (Yhanko School API) | `https://school-api-production-a1c6.up.railway.app` |
+| `PORT` | Porta local mapeada no Docker Compose | `3005` |
+
+---
+
+## 📦 Uso e Instalação Local
+
+```bash
+# 1. Clonar o repositório
+git clone https://github.com/yhankotech/school-super-admin.git
+cd school-super-admin
+
+# 2. Instalar dependências
 npm install
 
-```bash
+# 3. Iniciar servidor de desenvolvimento
+npm run dev
+
+# 4. Compilar para produção
 npm run build
+```
+
+---
+
+## 🐳 Execução com Docker & Docker Compose
+
+A imagem Docker foi projetada para alta performance, segurança não-root (UID 101) e leitura dinâmica de variáveis de ambiente em runtime via Nginx.
+
+### 1. Iniciar com Docker Compose (Recomendado)
 
 ```bash
-git clone https://github.com/yhankotech/school-super-admin
+# Subir container em background
+docker compose up -d --build
+
+# Visualizar logs em tempo real
+docker compose logs -f
+
+# Parar serviços
+docker compose down
+```
+
+O painel estará disponível em: `http://localhost:3005`
+
+### 2. Build e Execução Manual com Docker
+
+```bash
+# Build da imagem
+docker build -t school-super-admin:latest .
+
+# Executar com URL de API customizada em runtime
+docker run -d \
+  -p 3005:8080 \
+  -e VITE_SCHOOL_API_URL=https://school-api-production-a1c6.up.railway.app \
+  --name school-super-admin-frontend \
+  school-super-admin:latest
+```
+
+### 3. Verificação de Saúde (Healthcheck)
+
+```bash
+# Endpoint nativo sem ruído de logs
+curl http://localhost:3005/healthz
+# Retorno esperado: healthy
+```
